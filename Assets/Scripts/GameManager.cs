@@ -1,12 +1,13 @@
 using System;
 using System.Collections;
+using Unity.Android.Gradle.Manifest;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance { get; private set; }
-
+    [SerializeField] GameObject _respawn;
     public struct GameNotifications
     {
         public bool death;
@@ -37,10 +38,9 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
-    public IEnumerator Respawn(float delay, GameObject target, GameObject position)
-    {
+    public IEnumerator Respawn(float delay, GameObject target) {
         yield return new WaitForSeconds(delay);
-        target.transform.position = position.transform.position;
+        target.transform.position = _respawn.transform.position;
         _notifications.death = false;
     }
 

@@ -755,6 +755,8 @@ GameObject:
   m_Component:
   - component: {fileID: 61657007}
   - component: {fileID: 61657008}
+  - component: {fileID: 61657010}
+  - component: {fileID: 61657009}
   m_Layer: 0
   m_Name: Quad (10)
   m_TagString: Hazard
@@ -762,21 +764,25 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &61657007
-Transform:
+--- !u!224 &61657007
+RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 61657006}
-  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -225.2761, y: -115.45, z: -0.04638499}
+  m_LocalPosition: {x: 0, y: 0, z: -0.04638499}
   m_LocalScale: {x: 4.789755, y: -1.3607211, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 518229756}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -225.2761, y: -115.45}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!61 &61657008
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -823,6 +829,45 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 2.856528, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &61657009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 61657006}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d307b03fabe97ee4eaa05eb796cbd776, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!50 &61657010
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 61657006}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!1 &98308693
 GameObject:
   m_ObjectHideFlags: 0
@@ -4488,7 +4533,7 @@ MonoBehaviour:
   _layermask:
     serializedVersion: 2
     m_Bits: 256
-  _velocity: {x: 0, y: -1.7, z: 0}
+  _velocity: {x: 0, y: -1.8, z: 0}
   _duration: 0.5
   _curve:
     serializedVersion: 2
@@ -5685,8 +5730,8 @@ MonoBehaviour:
   _footSpeed: 2.2
   _coyoteTime: 0.09
   _restTime: 5
-  _respawn: {fileID: 666717285}
-  _jumpHeight: 0.5
+  _minJumpHeight: 0.2
+  _maxJumpHeight: 0.6
   _jumpTimed: 0.25
   _jumpFalloff: 0.11
   _maxJumpFalloff: 0
@@ -6556,6 +6601,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 140181be225acee45995e5a2a241740f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _respawn: {fileID: 666717285}
 --- !u!1 &1614514410
 GameObject:
   m_ObjectHideFlags: 0

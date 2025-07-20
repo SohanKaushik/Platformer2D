@@ -14,17 +14,18 @@ public class Player : MonoBehaviour
     [SerializeField] float _footSpeed;
     [SerializeField] float _coyoteTime;
     [SerializeField] float _restTime;
-    [SerializeField] GameObject _respawn;
 
     private float _coyoteTimer;
     private float _restTimer;
 
     [Header("Jump")]
-    [SerializeField] float _jumpHeight;
+    [SerializeField] float _minJumpHeight;
+    [SerializeField] float _maxJumpHeight;
     [SerializeField] float _jumpTimed;
     [SerializeField] float _jumpFalloff;
     [SerializeField] float _maxJumpFalloff;
-    private float _jumpVelocity;
+    private float _minJumpVelocity;
+    private float _maxJumpVelocity;
 
     [Header("Dash")]
     public float _dashSpeed;
@@ -55,7 +56,9 @@ public class Player : MonoBehaviour
     [HideInInspector]
     public Vector3 _velocity;
     private Vector2 _input;
-    private bool _jumpRequest;
+
+    private bool _jumpPressed;
+    private bool _jumpReleased;
     private bool _dashRequest;
 
     private float _smooothfactorx;
@@ -67,35 +70,38 @@ public class Player : MonoBehaviour
         _controller = GetComponent<Controller2D>();
         _trailRenderer = GetComponent<TrailRenderer>();
 
-        _gravity = -(2 * _jumpHeight) / Mathf.Pow(_jumpTimed,2);
-        _jumpVelocity = Mathf.Abs(_gravity) * _jumpTimed;
+        _gravity = -(2 * _maxJumpHeight) / Mathf.Pow(_jumpTimed,2);
+        _maxJumpVelocity = Mathf.Abs(_gravity) * _jumpTimed;
+        _minJumpVelocity = Mathf.Sqrt(2.0f * Mathf.Abs(_gravity) * _minJumpHeight);
 
         _coyoteTime = Mathf.Clamp(_coyoteTime, 0.001f, int.MaxValue);
         _restTimer = _restTime;
 
         _trailRenderer.time = _jumpTimed;
-        print("Gravity: [" + _gravity + "] Jump Velocity: [" + _jumpVelocity + "] Foot Speed: " + _footSpeed);
+        print("Gravity: [" + _gravity + "] Jump Velocity: [" + _maxJumpVelocity + "] Foot Speed: " + _footSpeed);
     }
 
     private void Update()
     {
         _input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
-        if (Input.anyKeyDown)
-        {
+        if (Input.anyKeyDown) {
             _animator.SetBool("_awake", true);
         }
 
-        if (Input.GetKeyDown(KeyCode.Space)){
-            _jumpRequest = true;
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            _jumpPressed = true;
         }
 
-        if (Input.GetMouseButtonDown(0)){
+        if (Input.GetKeyUp(KeyCode.Space)) {
+            _jumpReleased = true;
+        }
+
+        if (Input.GetKeyUp(KeyCode.K)) {
             _dashRequest = true;
         }
 
-        // Away From Keyboard
-        if (!Input.anyKey) {
+        if (!Input.anyKey){
             _restTimer -= Time.deltaTime;
         } else { 
             _restTimer = _restTime; _animator.SetBool("_isAFK", false);
@@ -105,37 +111,33 @@ public class Player : MonoBehaviour
             _animator.SetBool("_isAFK", true);
         }
 
-        if (_controller._colldata.above || _controller._colldata.below){
+        if (_controller._colldata.above || _controller._colldata.below) { 
             _velocity.y = 0.0f;
             _animator.SetBool("_isJumping", false) ;
         }
 
         if (GameManager.instance.Notifications.death) {
-            StartCoroutine(GameManager.instance.Respawn(0.4f, this.gameObject, _respawn));
+            StartCoroutine(GameManager.instance.Respawn(0.4f, this.gameObject));
         }
     }
 
     void FixedUpdate()
     {
-
-        if (_dashing) return;
-
         float targetvelocity = _input.x * _footSpeed;
         _velocity.x = Mathf.SmoothDamp(_velocity.x, targetvelocity, ref _smooothfactorx, (_controller._colldata.below) ? accelerationTimeGrounded : accelerationTimeAirborne);
 
         _animator.SetFloat("_speed", Mathf.Abs(_input.x));
         _animator.SetFloat("_vertical", _input.y);
-        _velocity.y += _gravity * Time.fixedDeltaTime;
 
         // Coyote Time
         _coyoteTimer = (_controller._colldata.below) ? _coyoteTime : _coyoteTimer-=Time.fixedDeltaTime;
 
+
         // Jump:
-        if (_jumpRequest)
+        if (_jumpPressed)
         {
-            if (_controller._colldata.below || _coyoteTimer >= 0.0f)
-            {
-                _velocity.y = _jumpVelocity;
+            if (_controller._colldata.below || _coyoteTimer >= 0.0f) {
+                _velocity.y = _maxJumpVelocity;
                 _coyoteTimer = 0.0f;
                 _animator.SetBool("_isJumping", true);
             }
@@ -160,21 +162,15 @@ public class Player : MonoBehaviour
                 }
                     _wallSliding = false;
             }
-            _jumpRequest = false; // consume jump
+            _jumpPressed = false; // consume jump
         }
 
-        //// Variable jump height logic:
-        //if (Input.GetKey(KeyCode.Space) && _velocity.y > 0)
-        //{
-        //    _velocity.y *= 0.5f; // cut upward momentum
-        //}
-
-        //// Variable Decelerate Curve:
-        //if (_velocity.y > 0.0f && !_controller._colldata.below)
-        //{
-        //    _velocity.y += (_gravity * _jumpFalloff) * Time.fixedDeltaTime;
-        //    _velocity.y += Mathf.Max(_velocity.y, _maxJumpFalloff);
-        //}
+        if (_jumpReleased) {
+            if (_velocity.y > _minJumpVelocity) {
+                _velocity.y = _minJumpVelocity;
+            }
+            _jumpReleased = false; // consume jump
+        }
 
         // Wall Jumping:
         if ((_controller._colldata.right || _controller._colldata.left) && !_controller._colldata.below && _velocity.y < 0)
@@ -185,21 +181,9 @@ public class Player : MonoBehaviour
         }
         else { _wallSliding = false; _animator.SetBool("_isWallClimbing", false); }
 
-        //if (_wallStickTimer > 0)
-        //{
-        //    _velocity.x = 0;
-        //    _smooothfactorx = 0;
+        // TODO: Wall Sticking, Double Jump, Dash
 
-        //    if (_input.x != _controller._colldata.direction && _input.x != 0) { 
-        //        _wallStickTimer -= Time.fixedDeltaTime;
-        //    }
-        //    else
-        //    {
-        //        _wallStickTimer = _wallUnStickTime;
-        //    }
-        //}
-        //else { _wallStickTimer = _wallUnStickTime; }
-
+        _velocity.y += _gravity * Time.fixedDeltaTime;
         _controller.move(_velocity * Time.fixedDeltaTime);
     }
 }
