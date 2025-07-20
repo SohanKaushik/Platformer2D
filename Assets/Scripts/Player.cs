@@ -5,10 +5,11 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-[RequireComponent (typeof(Controller2D))]
+[RequireComponent (typeof(Controller2D)), RequireComponent(typeof (PlayerInputs))] 
 public class Player : MonoBehaviour
 {
     public Controller2D _controller;
+    public PlayerInputs _playerInputs;
 
     [Header("Main")]
     [SerializeField] float _footSpeed;
@@ -51,15 +52,15 @@ public class Player : MonoBehaviour
     private float _wallStickTimer;
     [SerializeField] float _wallSlidingSpeedMax;
 
+    struct RequestBlock {
+       public bool _jumpPressed;
+       public bool _jumpReleased;
+       public bool _dashRequest;
+    } private RequestBlock _state;
 
     //privates
     [HideInInspector]
     public Vector3 _velocity;
-    private Vector2 _input;
-
-    private bool _jumpPressed;
-    private bool _jumpReleased;
-    private bool _dashRequest;
 
     private float _smooothfactorx;
     private float _gravity;
@@ -77,29 +78,22 @@ public class Player : MonoBehaviour
         _coyoteTime = Mathf.Clamp(_coyoteTime, 0.001f, int.MaxValue);
         _restTimer = _restTime;
 
+        _playerInputs = GetComponent<PlayerInputs>();
+
         _trailRenderer.time = _jumpTimed;
         print("Gravity: [" + _gravity + "] Jump Velocity: [" + _maxJumpVelocity + "] Foot Speed: " + _footSpeed);
     }
 
     private void Update()
     {
-        _input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-
         if (Input.anyKeyDown) {
             _animator.SetBool("_awake", true);
         }
 
-        if (Input.GetKeyDown(KeyCode.Space)) {
-            _jumpPressed = true;
-        }
+        _playerInputs._requests(ref _state._jumpPressed, Input.GetKeyDown(KeyCode.Space));
+        _playerInputs._requests(ref _state._jumpReleased, Input.GetKeyUp(KeyCode.Space));
+        _playerInputs._requests(ref _state._dashRequest, Input.GetKeyDown(KeyCode.K));
 
-        if (Input.GetKeyUp(KeyCode.Space)) {
-            _jumpReleased = true;
-        }
-
-        if (Input.GetKeyUp(KeyCode.K)) {
-            _dashRequest = true;
-        }
 
         if (!Input.anyKey){
             _restTimer -= Time.deltaTime;
@@ -123,18 +117,18 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
-        float targetvelocity = _input.x * _footSpeed;
+        float targetvelocity = _playerInputs._inputs().x * _footSpeed;
         _velocity.x = Mathf.SmoothDamp(_velocity.x, targetvelocity, ref _smooothfactorx, (_controller._colldata.below) ? accelerationTimeGrounded : accelerationTimeAirborne);
 
-        _animator.SetFloat("_speed", Mathf.Abs(_input.x));
-        _animator.SetFloat("_vertical", _input.y);
+        _animator.SetFloat("_speed", Mathf.Abs(_playerInputs._inputs().x));
+        _animator.SetFloat("_vertical", _playerInputs._inputs().y);
 
         // Coyote Time
         _coyoteTimer = (_controller._colldata.below) ? _coyoteTime : _coyoteTimer-=Time.fixedDeltaTime;
 
 
         // Jump:
-        if (_jumpPressed)
+        if (_state._jumpPressed)
         {
             if (_controller._colldata.below || _coyoteTimer >= 0.0f) {
                 _velocity.y = _maxJumpVelocity;
@@ -144,7 +138,7 @@ public class Player : MonoBehaviour
 
             if (_wallSliding) {
 
-                if(_controller._colldata.direction == _input.x)
+                if(_controller._colldata.direction == _playerInputs._inputs().x)
                 {
                     // pushes player in opposite direction ( not to the other wall)
                     _velocity.x = -_controller._colldata.direction * _wallJumpClimb.x;
@@ -162,14 +156,14 @@ public class Player : MonoBehaviour
                 }
                     _wallSliding = false;
             }
-            _jumpPressed = false; // consume jump
+            _state._jumpPressed = false; // consume jump
         }
 
-        if (_jumpReleased) {
+        if (_state._jumpReleased) {
             if (_velocity.y > _minJumpVelocity) {
                 _velocity.y = _minJumpVelocity;
             }
-            _jumpReleased = false; // consume jump
+            _state._jumpReleased = false; // consume jump
         }
 
         // Wall Jumping:
@@ -186,4 +180,5 @@ public class Player : MonoBehaviour
         _velocity.y += _gravity * Time.fixedDeltaTime;
         _controller.move(_velocity * Time.fixedDeltaTime);
     }
+
 }
