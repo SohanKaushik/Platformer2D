@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 [RequireComponent (typeof(Controller2D)), RequireComponent(typeof (PlayerInputs))] 
-public class Player : MonoBehaviour
+public class PLayer : MonoBehaviour
 {
     public Controller2D _controller;
     public PlayerInputs _playerInputs;

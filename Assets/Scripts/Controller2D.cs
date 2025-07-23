@@ -17,6 +17,7 @@ public class Controller2D : RaycastController {
         UpdateRayOrigins();
         _colldata.reset();
 
+        if(_colldata.below || _colldata.above) velocity.y = 0;
 
         if(velocity.x != 0)
         {

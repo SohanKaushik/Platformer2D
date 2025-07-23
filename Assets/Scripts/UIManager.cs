@@ -7,7 +7,7 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager instance;
 
-    [SerializeField] private Player _player;
+    [SerializeField] private PLayer _player;
     [SerializeField] private TMP_Text _below;
     [SerializeField] private TMP_Text _wallSliding;
     [SerializeField] private TMP_Text _velocity;
