@@ -17,7 +17,6 @@ public class Controller2D : RaycastController {
         UpdateRayOrigins();
         _colldata.reset();
 
-        if(_colldata.below || _colldata.above) velocity.y = 0;
 
         if(velocity.x != 0)
         {
@@ -25,11 +24,15 @@ public class Controller2D : RaycastController {
         }
 
         HorizontalCollision(ref velocity);
-        if (velocity.y != 0) {
-           VerticalCollision(ref velocity);
-        }
+            VerticalCollision(ref velocity);
+        //if (velocity.y != 0) {
+        //}
 
-       transform.Translate(velocity, Space.World);
+        // [] Flip
+        transform.rotation = (_colldata.direction == -1) ?
+            Quaternion.Euler(transform.rotation.x, 180f, transform.rotation.z) : Quaternion.Euler(transform.rotation.x, 0f, transform.rotation.z);
+
+        transform.Translate(velocity, Space.World);
     }
 
     protected override void VerticalCollision(ref Vector3 velocity)
@@ -88,5 +91,7 @@ public class Controller2D : RaycastController {
             Debug.DrawRay(rayo, Vector2.right * directionX * raylength, Color.blue);
         }
     }
+
+    public bool isGrounded() => _colldata.below;
 }
 

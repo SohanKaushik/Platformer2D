@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class PlayerStateMachine 
 {
-    // getter for the reference value stored in Player State
     public PlayerState _currentState { get; private set; }
 
     public void StartState(PlayerState _startState) {
@@ -14,5 +13,10 @@ public class PlayerStateMachine
         //_currentState.OnExit();
         _currentState = state;
         state.OnEnter();
+    }
+
+    public PlayerStateList name()
+    {
+        return _currentState._name;
     }
 }

@@ -22,10 +22,6 @@ public abstract class RaycastController : MonoBehaviour
     private void Update()
     {
         CalculateRaySpacing();
-
-        // [] Flip
-        transform.rotation = (_colldata.direction == -1) ?
-            Quaternion.Euler(transform.rotation.x, 180f, transform.rotation.z) : Quaternion.Euler(transform.rotation.x, 0f, transform.rotation.z);
     }
 
     public void UpdateRayOrigins()

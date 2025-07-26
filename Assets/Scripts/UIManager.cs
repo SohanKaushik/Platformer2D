@@ -7,9 +7,9 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager instance;
 
-    [SerializeField] private PLayer _player;
+    [SerializeField] private Player _player;
     [SerializeField] private TMP_Text _below;
-    [SerializeField] private TMP_Text _wallSliding;
+    [SerializeField] private TMP_Text _state;
     [SerializeField] private TMP_Text _velocity;
 
     [Header("Death")]
@@ -25,9 +25,10 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
-        _below.SetText("Below : " + _player._controller._colldata.below);
+        _below.SetText("isGrounded : " + _player._controller._colldata.below);
         _velocity.SetText("Velocity : " + _player._velocity.ToString());
-        _wallSliding.SetText("Wall Sliding : " + _player._wallSliding);
+        //_wallSliding.SetText("Wall Sliding : " + _player._wallSliding);
+        _state.SetText("State: " + _player._stateMachine.name());
 
         if (GameManager.instance.Notifications.death) { 
              StartCoroutine(ShowDeathUI(_deathUI, _deathShowUIDuration));
