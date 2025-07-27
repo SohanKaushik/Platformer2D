@@ -10,7 +10,6 @@ public class FallState : PlayerState
 
         if(player.isGrounded()) { 
             stateMachine.ChangeStateTo(player._idle_state);
-            player._velocity = Vector3.zero;
             return;
         }
 

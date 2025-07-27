@@ -10,7 +10,7 @@ public abstract class RaycastController : MonoBehaviour
     public CollisionData _colldata;
 
     private BoxCollider2D _collider;
-    protected float skinWidth = 0.015f;
+    protected float skinWidth = 0.09f;
     protected float vraySpacing, hraySpacing;
 
     public virtual void Start()

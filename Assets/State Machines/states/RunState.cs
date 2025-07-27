@@ -18,6 +18,10 @@ public class RunState : PlayerState
 
     public override void Update()
     {
+        // # jump
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            player.jumpRequest = true;
+        }
 
         // # idle 
         if (Mathf.Abs(player.GetAxisDirections().x) == 0) { 
@@ -28,6 +32,12 @@ public class RunState : PlayerState
 
     public override void FixedUpdate()
     {
-       player._velocity.x = player.GetAxisDirections().x * _footSpeed;
+        // # jump 
+        if (player.jumpRequest) {
+            stateMachine.ChangeStateTo(player._jump_state);
+            return;
+        }
+
+        player._velocity.x = player.GetAxisDirections().x * _footSpeed;
     }
 }

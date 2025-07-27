@@ -39,7 +39,6 @@ public class yuo : MonoBehaviour
 
         _idle_state = new IdleState(this, _stateMachine);
         _run_state = new RunState(this, _stateMachine, _footSpeed);
-        _jump_state = new JumpState(this, _stateMachine, _maxJumpHeight, _jumpDuration, _maxJumpVelocity);
         _fall_state = new FallState(this, _stateMachine);
     }
 
@@ -50,6 +49,7 @@ public class yuo : MonoBehaviour
         _gravity = -(2 * _maxJumpHeight) / Mathf.Pow(_jumpDuration, 2);
         _maxJumpVelocity = Mathf.Abs(_gravity) * _jumpDuration;
 
+        _jump_state = new JumpState(this, _stateMachine, _maxJumpHeight, _jumpDuration, _maxJumpVelocity);
         print("Gravity: [" + _gravity + "] || " + "Velocity: [" + _maxJumpVelocity + "]");
         _stateMachine.StartState(_fall_state);
     }
@@ -57,7 +57,7 @@ public class yuo : MonoBehaviour
     private void Update()
     {
         _stateMachine._currentState.Update();
-
+        Debug.Log(isGrounded());
     }
 
     void FixedUpdate()

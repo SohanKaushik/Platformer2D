@@ -28,7 +28,7 @@ public class UIManager : MonoBehaviour
         _below.SetText("isGrounded : " + _player.isGrounded());
         _velocity.SetText("Velocity : " + _player._velocity.ToString());
         //_wallSliding.SetText("Wall Sliding : " + _player._wallSliding);
-        _state.SetText("State: " + _player._stateMachine.name());
+        //_state.SetText("State: " + _player._stateMachine.name());
 
         if (GameManager.instance.Notifications.death) { 
              StartCoroutine(ShowDeathUI(_deathUI, _deathShowUIDuration));
