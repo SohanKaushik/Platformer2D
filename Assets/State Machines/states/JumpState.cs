@@ -1,31 +1,34 @@
+using System.Collections;
 using UnityEngine;
 
 public class JumpState : PlayerState
 {
     private float _maxJumpHeight;
     private float _jumpDuration;
-
-    private float _minJumpVelocity;
     private float _maxJumpVelocity;
-    public JumpState(Player player, PlayerStateMachine state, float maxHeight, float duartion, float maxJumpVelocity)
+    private bool _hasJumped;
+
+    public JumpState(yuo player, PlayerStateMachine state, float maxHeight, float duration, float maxJumpVelocity)
         : base(player, state, PlayerStateList.Jumping)
-    { 
+    {
         _maxJumpHeight = maxHeight;
-        _jumpDuration = duartion;
+        _jumpDuration = duration;
         _maxJumpVelocity = maxJumpVelocity;
     }
 
     public override void OnEnter()
     {
-        // # apply jump once
+        // Apply jump velocity
         player._velocity.y = _maxJumpVelocity;
     }
 
     public override void Update()
     {
-       if (player._velocity.y >= _maxJumpHeight)
-       {
-            stateMachine.ChangeStateTo(player._idle_state); 
-       }
+
+        // Transition to falling when moving downward
+        if (player._velocity.y <= 0f)
+        {
+            stateMachine.ChangeStateTo(player._fall_state); 
+        }
     }
 }

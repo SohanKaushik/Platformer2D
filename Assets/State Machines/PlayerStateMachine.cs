@@ -10,7 +10,7 @@ public class PlayerStateMachine
     }
 
     public void ChangeStateTo(PlayerState state) {
-        //_currentState.OnExit();
+        _currentState.OnExit();
         _currentState = state;
         state.OnEnter();
     }

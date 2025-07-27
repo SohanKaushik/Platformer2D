@@ -1,9 +1,4 @@
-using System.Collections;
-using Unity.Android.Gradle.Manifest;
-using Unity.Cinemachine;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 [RequireComponent (typeof(Controller2D)), RequireComponent(typeof (PlayerInputs))] 
 public class PLayer : MonoBehaviour
@@ -69,7 +64,7 @@ public class PLayer : MonoBehaviour
     void Start()
     {
         _controller = GetComponent<Controller2D>();
-        _trailRenderer = GetComponent<TrailRenderer>();
+        //_trailRenderer = GetComponent<TrailRenderer>();
 
         _gravity = -(2 * _maxJumpHeight) / Mathf.Pow(_jumpTimed,2);
         _maxJumpVelocity = Mathf.Abs(_gravity) * _jumpTimed;
@@ -80,14 +75,14 @@ public class PLayer : MonoBehaviour
 
         _playerInputs = GetComponent<PlayerInputs>();
 
-        _trailRenderer.time = _jumpTimed;
+        //_trailRenderer.time = _jumpTimed;
         print("Gravity: [" + _gravity + "] Jump Velocity: [" + _maxJumpVelocity + "] Foot Speed: " + _footSpeed);
     }
 
     private void Update()
     {
         if (Input.anyKeyDown) {
-            _animator.SetBool("_awake", true);
+            //_animator.SetBool("_awake", true);
         }
 
         _playerInputs._requests(ref _state._jumpPressed, Input.GetKeyDown(KeyCode.Space));
@@ -98,16 +93,17 @@ public class PLayer : MonoBehaviour
         if (!Input.anyKey){
             _restTimer -= Time.deltaTime;
         } else { 
-            _restTimer = _restTime; _animator.SetBool("_isAFK", false);
+            _restTimer = _restTime;
+            //_animator.SetBool("_isAFK", false);
         }
 
         if (_restTimer <= 0.0f) {
-            _animator.SetBool("_isAFK", true);
+            //_animator.SetBool("_isAFK", true);
         }
 
         if (_controller._colldata.above || _controller._colldata.below) { 
             _velocity.y = 0.0f;
-            _animator.SetBool("_isJumping", false) ;
+            //_animator.SetBool("_isJumping", false) ;
         }
 
         if (GameManager.instance.Notifications.death) {
@@ -117,66 +113,68 @@ public class PLayer : MonoBehaviour
 
     void FixedUpdate()
     {
-        float targetvelocity = _playerInputs._inputs().x * _footSpeed;
-        _velocity.x = Mathf.SmoothDamp(_velocity.x, targetvelocity, ref _smooothfactorx, (_controller._colldata.below) ? accelerationTimeGrounded : accelerationTimeAirborne);
+       // float targetvelocity = _playerInputs._inputs().x * _footSpeed;
+       // _velocity.x = Mathf.SmoothDamp(_velocity.x, targetvelocity, ref _smooothfactorx, (_controller._colldata.below) ? accelerationTimeGrounded : accelerationTimeAirborne);
 
-        _animator.SetFloat("_speed", Mathf.Abs(_playerInputs._inputs().x));
-        _animator.SetFloat("_vertical", _playerInputs._inputs().y);
+       ////_animator.SetFloat("_speed", Mathf.Abs(_playerInputs._inputs().x));
+       ////_animator.SetFloat("_vertical", _playerInputs._inputs().y);
 
-        // Coyote Time
-        _coyoteTimer = (_controller._colldata.below) ? _coyoteTime : _coyoteTimer-=Time.fixedDeltaTime;
+       // // Coyote Time
+       // _coyoteTimer = (_controller._colldata.below) ? _coyoteTime : _coyoteTimer-=Time.fixedDeltaTime;
 
 
-        // Jump:
-        if (_state._jumpPressed)
-        {
-            if (_controller._colldata.below || _coyoteTimer >= 0.0f) {
-                _velocity.y = _maxJumpVelocity;
-                _coyoteTimer = 0.0f;
-                _animator.SetBool("_isJumping", true);
-            }
+       // // Jump:
+       // if (_state._jumpPressed)
+       // {
+       //     if (_controller._colldata.below || _coyoteTimer >= 0.0f) {
+       //         _velocity.y = _maxJumpVelocity;
+       //         _coyoteTimer = 0.0f;
+       //         //_animator.SetBool("_isJumping", true);
+       //     }
 
-            if (_wallSliding) {
+       //     if (_wallSliding) {
 
-                if(_controller._colldata.direction == _playerInputs._inputs().x)
-                {
-                    // pushes player in opposite direction ( not to the other wall)
-                    _velocity.x = -_controller._colldata.direction * _wallJumpClimb.x;
-                    _velocity.y = _wallJumpClimb.y;
-                }
-                else if(_controller._colldata.direction == 0)
-                {
-                    _velocity.x = -_controller._colldata.direction * _wallJumpOff.x;
-                    _velocity.y = _wallJumpOff.y;
-                }
-                else
-                {
-                    _velocity.x = -_controller._colldata.direction * _wallLeap.x;
-                    _velocity.y += _wallLeap.y;
-                }
-                    _wallSliding = false;
-            }
-            _state._jumpPressed = false; // consume jump
-        }
+       //         if(_controller._colldata.direction == _playerInputs._inputs().x)
+       //         {
+       //             // pushes player in opposite direction ( not to the other wall)
+       //             _velocity.x = -_controller._colldata.direction * _wallJumpClimb.x;
+       //             _velocity.y = _wallJumpClimb.y;
+       //         }
+       //         else if(_controller._colldata.direction == 0)
+       //         {
+       //             _velocity.x = -_controller._colldata.direction * _wallJumpOff.x;
+       //             _velocity.y = _wallJumpOff.y;
+       //         }
+       //         else
+       //         {
+       //             _velocity.x = -_controller._colldata.direction * _wallLeap.x;
+       //             _velocity.y += _wallLeap.y;
+       //         }
+       //             _wallSliding = false;
+       //     }
+       //     _state._jumpPressed = false; // consume jump
+       // }
 
-        if (_state._jumpReleased) {
-            if (_velocity.y > _minJumpVelocity) {
-                _velocity.y = _minJumpVelocity;
-            }
-            _state._jumpReleased = false; // consume jump
-        }
+       // if (_state._jumpReleased) {
+       //     if (_velocity.y > _minJumpVelocity) {
+       //         _velocity.y = _minJumpVelocity;
+       //     }
+       //     _state._jumpReleased = false; // consume jump
+       // }
 
-        // Wall Jumping:
-        if ((_controller._colldata.right || _controller._colldata.left) && !_controller._colldata.below && _velocity.y < 0)
-        {
-            _wallSliding = true;
-            _animator.SetBool("_isWallClimbing", true);
-            _velocity.y = Mathf.Max(_velocity.y, -_wallSlidingSpeedMax);
-        }
-        else { _wallSliding = false; _animator.SetBool("_isWallClimbing", false); }
+       // // Wall Jumping:
+       // if ((_controller._colldata.right || _controller._colldata.left) && !_controller._colldata.below && _velocity.y < 0)
+       // {
+       //     _wallSliding = true;
+       //     //_animator.SetBool("_isWallClimbing", true);
+       //     _velocity.y = Mathf.Max(_velocity.y, -_wallSlidingSpeedMax);
+       // }
+       // else { _wallSliding = false;
+       //     //_animator.SetBool("_isWallClimbing", false); 
+       // }
 
         // TODO: Wall Sticking, Double Jump, Dash
-
+        Debug.Log(_velocity.y);
         _velocity.y += _gravity * Time.fixedDeltaTime;
         _controller.move(_velocity * Time.fixedDeltaTime);
     }
