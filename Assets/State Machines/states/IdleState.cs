@@ -9,21 +9,24 @@ public class IdleState : PlayerState {
 
     public override void OnEnter() {
         player._velocity.x = 0.0f;
-        player._coyoteTimer = player._coyoteTime;
+        player._velocity.y = -0.001f;
     }
 
-    public override void FixedUpdate() {
 
+    public override void Update()
+    {
         // # jump 
         if (player.jumpRequest) {
             stateMachine.ChangeStateTo(player._jump_state);
             return;
         }
+    }
 
+    public override void FixedUpdate() {
         // # run
-        if (Mathf.Abs(player.GetAxisDirections().x) > Mathf.Epsilon)
-        {
+        if (Mathf.Abs(player.GetAxisDirections().x) > 0.1f) {
             stateMachine.ChangeStateTo(player._run_state);
+            return;
         }
     }
 }

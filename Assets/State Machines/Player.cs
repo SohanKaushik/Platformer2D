@@ -1,3 +1,4 @@
+using Unity.Android.Gradle.Manifest;
 using UnityEngine;
 using UnityEngine.Assertions.Must;
 using UnityEngine.Rendering;
@@ -26,7 +27,7 @@ public class Player : MonoBehaviour
     [HideInInspector] public float _gravity = -1.0f;
 
     [HideInInspector] public bool jumpRequest;
-
+    [HideInInspector] public bool jumpReleased;
     public float _coyoteTime;
     private float _maxJumpVelocity;
 
@@ -58,23 +59,28 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        _stateMachine._currentState.Update();
+        // Jump input states
+        jumpRequest = Input.GetButtonDown("Jump");
+        //jumpHeld = Input.GetButton("Jump");
+        jumpReleased = Input.GetButtonUp("Jump");
 
-        if (Input.GetKeyDown(KeyCode.Space)) {
-            jumpRequest = true;
-        }
+
 
         if (!isGrounded()) {
+
+            if (_controller._colldata.above) _velocity.y = 0.01f;
             _stateMachine.ChangeStateTo(_fall_state);
         }
+
+        _coyoteTimer = (isGrounded()) ? _coyoteTime : _coyoteTimer -= Time.deltaTime;
+        Debug.Log(_coyoteTimer);
+        _stateMachine._currentState.Update();
     }
 
     void FixedUpdate()
     {
-        _coyoteTimer = (isGrounded()) ? _coyoteTime : _coyoteTimer-=Time.fixedDeltaTime;
-
         _stateMachine._currentState.FixedUpdate();
-        _controller.move(_velocity * Time.fixedDeltaTime);
+        _controller.move(_velocity * Time.deltaTime);
     }
 
     public Vector2 GetAxisDirections()

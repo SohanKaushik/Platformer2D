@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 public class JumpState : PlayerState
@@ -16,18 +15,7 @@ public class JumpState : PlayerState
     }
 
     public override void OnEnter()
-    {
-        // # applied jump force once
+    {   
         player._velocity.y = _maxJumpVelocity;
-        player.jumpRequest = false; // consumes jump
-    }
-
-    public override void Update()
-    {
-
-        //// # fall
-        //if (player._velocity.y <= _maxJumpVelocity) {
-        //    stateMachine.ChangeStateTo(player._fall_state);
-        //}
     }
 }
