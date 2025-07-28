@@ -7,7 +7,7 @@ public class JumpState : PlayerState
     private float _jumpDuration;
     private float _maxJumpVelocity;
 
-    public JumpState(yuo player, PlayerStateMachine state, float maxHeight, float duration, float maxJumpVelocity)
+    public JumpState(Player player, PlayerStateMachine state, float maxHeight, float duration, float maxJumpVelocity)
         : base(player, state, PlayerStateList.Jumping)
     {
         _maxJumpHeight = maxHeight;
@@ -17,17 +17,17 @@ public class JumpState : PlayerState
 
     public override void OnEnter()
     {
-        // Apply jump velocity
+        // # applied jump force once
         player._velocity.y = _maxJumpVelocity;
+        player.jumpRequest = false; // consumes jump
     }
 
     public override void Update()
     {
 
-        // # fall
-        if (player._velocity.y <= _maxJumpVelocity) {
-            stateMachine.ChangeStateTo(player._fall_state);
-            player.jumpRequest = false;
-        }
+        //// # fall
+        //if (player._velocity.y <= _maxJumpVelocity) {
+        //    stateMachine.ChangeStateTo(player._fall_state);
+        //}
     }
 }

@@ -3,11 +3,11 @@ using UnityEngine;
 // # this is a base class
 public abstract class PlayerState {
 
-    protected yuo player;
+    protected Player player;
     protected PlayerStateMachine stateMachine;
     public PlayerStateList _name;
 
-    public PlayerState(yuo player, PlayerStateMachine state, PlayerStateList name) { 
+    public PlayerState(Player player, PlayerStateMachine state, PlayerStateList name) { 
         this.player = player;
         this.stateMachine = state;
         this._name = name;

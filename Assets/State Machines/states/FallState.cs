@@ -2,19 +2,41 @@ using UnityEngine;
 
 public class FallState : PlayerState
 {
-    public FallState(yuo player, PlayerStateMachine state) : base(player, state, PlayerStateList.Falling)
-    { }
+    private float _terminalMultiplier;
+    public FallState(Player player, PlayerStateMachine state, float terminalMultiplier) : base(player, state, PlayerStateList.Falling)
+    {
+        _terminalMultiplier = terminalMultiplier;
+    }
+
+    public override void Update()
+    {
+        if (player.isGrounded()) {
+            stateMachine.ChangeStateTo(player._idle_state);
+            return;
+        }
+    }
 
     public override void FixedUpdate()
     {
 
-        if(player.isGrounded()) { 
-            stateMachine.ChangeStateTo(player._idle_state);
+        // # jump 
+        if (player.jumpRequest && player._coyoteTimer >= 0.0f) {
+            stateMachine.ChangeStateTo(player._jump_state);
             return;
         }
 
         // # it has a depecdency to the jump Height and duration
         player._velocity.x = player.GetAxisDirections().x * player._footSpeed;
-        player._velocity.y += player._gravity * Time.fixedDeltaTime;
+
+        var fallSpeed = player._velocity.y + player._gravity * Time.fixedDeltaTime;
+
+        //var terminalVelocity = 
+
+        player._velocity.y = Mathf.Max(fallSpeed, -_terminalMultiplier);
+
+    }
+
+    public override void OnExit()
+    {
     }
 }

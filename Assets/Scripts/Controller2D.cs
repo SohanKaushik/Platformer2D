@@ -24,8 +24,8 @@ public class Controller2D : RaycastController {
         }
 
         HorizontalCollision(ref velocity);
-            VerticalCollision(ref velocity);
         if (velocity.y != 0) {
+            VerticalCollision(ref velocity);
         }
 
         // [] Flip

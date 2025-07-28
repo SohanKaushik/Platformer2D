@@ -7,7 +7,7 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager instance;
 
-    [SerializeField] private yuo _player;
+    [SerializeField] private Player _player;
     [SerializeField] private TMP_Text _below;
     [SerializeField] private TMP_Text _state;
     [SerializeField] private TMP_Text _velocity;
@@ -28,7 +28,7 @@ public class UIManager : MonoBehaviour
         _below.SetText("isGrounded : " + _player.isGrounded());
         _velocity.SetText("Velocity : " + _player._velocity.ToString());
         //_wallSliding.SetText("Wall Sliding : " + _player._wallSliding);
-        //_state.SetText("State: " + _player._stateMachine.name());
+        _state.SetText("State: " + _player._stateMachine.name());
 
         if (GameManager.instance.Notifications.death) { 
              StartCoroutine(ShowDeathUI(_deathUI, _deathShowUIDuration));
