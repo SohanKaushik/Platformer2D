@@ -6,19 +6,25 @@ using UnityEngine.Rendering;
 [RequireComponent(typeof(Controller2D))]
 public class Player : MonoBehaviour
 {
-
-    public PlayerStateMachine _stateMachine;
-    public Controller2D _controller;
-
+    [Header("Walk")]
     public float _footSpeed;
-
-    [Header("Jump Settings")]
-    [SerializeField] private float _maxJumpHeight;
-    [SerializeField] private float _jumpDuration;
-    [SerializeField] private float _terminalMultiplier;
-    
+    [HideInInspector] public PlayerStateMachine _stateMachine;
+    [HideInInspector] public Controller2D _controller;
     [SerializeField] float _accelerationTimeGrounded;
+
+
+    [Header("Jump")]
+    [SerializeField] private float _jumpDuration;
+    [SerializeField] float _coyoteDuration;
+    [SerializeField] private float _maxJumpHeight;
+    [SerializeField] private float _minJumpHeight;
+    [SerializeField] private float _terminalVelocity;
+    
     [SerializeField] float _accelerationTimeAirborne;
+
+    [Header("Dash")]
+    [SerializeField] float _dashSpeed;
+    [SerializeField] float _dashDuration;
 
     // states
     public IdleState _idle_state;
@@ -31,7 +37,6 @@ public class Player : MonoBehaviour
 
     [HideInInspector] public bool jumpRequest;
     [HideInInspector] public bool jumpReleased;
-    public float _coyoteTime;
     private float _maxJumpVelocity;
 
     [HideInInspector] public float _coyoteTimer;
@@ -46,7 +51,7 @@ public class Player : MonoBehaviour
 
         _idle_state = new IdleState(this, _stateMachine);
         _run_state = new RunState(this, _stateMachine, _footSpeed, _accelerationTimeGrounded);
-        _fall_state = new FallState(this, _stateMachine, _terminalMultiplier, _accelerationTimeAirborne);
+        _fall_state = new FallState(this, _stateMachine, _terminalVelocity, _accelerationTimeAirborne);
     }
 
     private void Start()
@@ -76,7 +81,7 @@ public class Player : MonoBehaviour
             _stateMachine.ChangeStateTo(_fall_state);
         }
 
-        _coyoteTimer = (isGrounded()) ? _coyoteTime : _coyoteTimer -= Time.deltaTime;
+        _coyoteTimer = (isGrounded()) ? _coyoteDuration : _coyoteTimer -= Time.deltaTime;
         _stateMachine._currentState.Update();
     }
 
