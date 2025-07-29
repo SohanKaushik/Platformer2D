@@ -16,6 +16,9 @@ public class Player : MonoBehaviour
     [SerializeField] private float _maxJumpHeight;
     [SerializeField] private float _jumpDuration;
     [SerializeField] private float _terminalMultiplier;
+    
+    [SerializeField] float _accelerationTimeGrounded;
+    [SerializeField] float _accelerationTimeAirborne;
 
     // states
     public IdleState _idle_state;
@@ -32,6 +35,7 @@ public class Player : MonoBehaviour
     private float _maxJumpVelocity;
 
     [HideInInspector] public float _coyoteTimer;
+    [HideInInspector] public float _smooothfactorx;
 
     void Awake()
     {
@@ -41,8 +45,8 @@ public class Player : MonoBehaviour
 
 
         _idle_state = new IdleState(this, _stateMachine);
-        _run_state = new RunState(this, _stateMachine, _footSpeed);
-        _fall_state = new FallState(this, _stateMachine, _terminalMultiplier);
+        _run_state = new RunState(this, _stateMachine, _footSpeed, _accelerationTimeGrounded);
+        _fall_state = new FallState(this, _stateMachine, _terminalMultiplier, _accelerationTimeAirborne);
     }
 
     private void Start()
@@ -73,7 +77,6 @@ public class Player : MonoBehaviour
         }
 
         _coyoteTimer = (isGrounded()) ? _coyoteTime : _coyoteTimer -= Time.deltaTime;
-        Debug.Log(_coyoteTimer);
         _stateMachine._currentState.Update();
     }
 

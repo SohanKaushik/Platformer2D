@@ -3,15 +3,25 @@ using UnityEngine;
 public class FallState : PlayerState
 {
     private float _terminalMultiplier;
-    public FallState(Player player, PlayerStateMachine state, float terminalMultiplier) : base(player, state, PlayerStateList.Falling)
+    private float _accelerationTimeAirborne = 0.05f;
+
+    public FallState(Player player, PlayerStateMachine state, float terminalMultiplier, float accelerationTimeAirborne) : base(player, state, PlayerStateList.Falling)
     {
         _terminalMultiplier = terminalMultiplier;
+        _accelerationTimeAirborne = accelerationTimeAirborne;
     }
 
     public override void Update()
     {
+        // # run or idle
         if (player.isGrounded()) {
-            stateMachine.ChangeStateTo(player._idle_state);
+
+            if (Mathf.Abs(player.GetAxisDirections().x) > 0.1f) {
+                stateMachine.ChangeStateTo(player._run_state);
+            }
+            else{
+                stateMachine.ChangeStateTo(player._idle_state);
+            }
             return;
         }
 
@@ -26,8 +36,10 @@ public class FallState : PlayerState
     public override void FixedUpdate()
     {
         // # it has a depecdency to the jump Height and duration
-        player._velocity.x = player.GetAxisDirections().x * player._footSpeed;
+        var targetvelocity = player.GetAxisDirections().x * player._footSpeed;
+        player._velocity.x = Mathf.SmoothDamp(player._velocity.x, targetvelocity, ref player._smooothfactorx, _accelerationTimeAirborne);
 
+        // # terminal velocity
         var fallSpeed = player._velocity.y + player._gravity * Time.fixedDeltaTime;
         player._velocity.y = Mathf.Max(fallSpeed, -_terminalMultiplier);
 

@@ -5,13 +5,12 @@ using UnityEngine;
 public class RunState : PlayerState
 {
     private float _footSpeed;
-    private float _smooothfactorx;
-    private float accelerationTimeGrounded = 0.0f;
-    private float accelerationTimeAirborne = 0.0f;
+    private float _accelerationTimeGrounded = 0.05f;
 
     // [] Player -> Run State -> Player State ( protected variables )
-    public RunState(Player player, PlayerStateMachine state, float speed) : base(player, state, PlayerStateList.Running) { 
+    public RunState(Player player, PlayerStateMachine state, float speed, float accelerationTimeGrounded) : base(player, state, PlayerStateList.Running) { 
         _footSpeed = speed;
+        _accelerationTimeGrounded = accelerationTimeGrounded;
     }
 
     public override void OnEnter()
@@ -38,6 +37,6 @@ public class RunState : PlayerState
     public override void FixedUpdate()
     {
         var targetvelocity = player.GetAxisDirections().x * _footSpeed;
-        player._velocity.x = Mathf.SmoothDamp(player._velocity.x, targetvelocity, ref _smooothfactorx, (player.isGrounded()) ? accelerationTimeGrounded : accelerationTimeAirborne);
+        player._velocity.x = Mathf.SmoothDamp(player._velocity.x, targetvelocity, ref player._smooothfactorx, _accelerationTimeGrounded);
     }
 }
