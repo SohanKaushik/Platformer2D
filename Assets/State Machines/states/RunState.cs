@@ -21,8 +21,7 @@ public class RunState : PlayerState
     public override void Update()
     {
         // # jump 
-        if (player.jumpRequest && player._coyoteTimer >= 0.0f){
-
+        if ((player._context.jumpRequest && player.coyoteCounter >= 0.0f) || player.jumpBufferCounter > 0.0f) { 
             stateMachine.ChangeStateTo(player._jump_state);
             return;
         }

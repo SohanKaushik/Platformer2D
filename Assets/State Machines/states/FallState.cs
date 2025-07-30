@@ -26,8 +26,12 @@ public class FallState : PlayerState
         }
 
         // # jump 
-        if (player.jumpRequest && player._coyoteTimer >= 0.0f)
-        {
+        //if (player.jumpBufferCounter > 0.0f){
+        //    stateMachine.ChangeStateTo(player._jump_state);
+        //    return;
+        //}
+
+        if (player._context.jumpRequest && player.coyoteCounter >= 0.0f) {
             stateMachine.ChangeStateTo(player._jump_state);
             return;
         }

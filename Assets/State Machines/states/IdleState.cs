@@ -17,7 +17,7 @@ public class IdleState : PlayerState {
     public override void Update()
     {
         // # jump 
-        if (player.jumpRequest) {
+        if (player.jumpBufferCounter > 0.0f) {
             stateMachine.ChangeStateTo(player._jump_state);
             return;
         }

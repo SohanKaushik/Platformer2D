@@ -15,9 +15,10 @@ public class Player : MonoBehaviour
 
     [Header("Jump")]
     [SerializeField] private float _jumpDuration;
-    [SerializeField] float _coyoteDuration;
-    [SerializeField] private float _maxJumpHeight;
+    [SerializeField] float _coyoteTime;
+    [SerializeField] float jumpBufferTime;
     [SerializeField] private float _minJumpHeight;
+    [SerializeField] private float _maxJumpHeight;
     [SerializeField] private float _terminalVelocity;
     
     [SerializeField] float _accelerationTimeAirborne;
@@ -35,12 +36,16 @@ public class Player : MonoBehaviour
     [HideInInspector] public Vector3 _velocity;
     [HideInInspector] public float _gravity = -1.0f;
 
-    [HideInInspector] public bool jumpRequest;
-    [HideInInspector] public bool jumpReleased;
-    private float _maxJumpVelocity;
+    public struct PublicContext { 
+         public bool jumpRequest;
+         public bool jumpReleased;
+    } public PublicContext _context;
 
-    [HideInInspector] public float _coyoteTimer;
+    private float _maxJumpVelocity;
+    [HideInInspector] public float coyoteCounter;
     [HideInInspector] public float _smooothfactorx;
+
+    [HideInInspector] public float jumpBufferCounter;
 
     void Awake()
     {
@@ -69,23 +74,23 @@ public class Player : MonoBehaviour
     private void Update()
     {
         // Jump input states
-        jumpRequest = Input.GetButtonDown("Jump");
+        _context.jumpRequest = Input.GetButtonDown("Jump");
+        jumpBufferCounter = (_context.jumpRequest) ? jumpBufferTime : jumpBufferCounter -= Time.deltaTime;
+
         //jumpHeld = Input.GetButton("Jump");
-        jumpReleased = Input.GetButtonUp("Jump");
-
-
+        _context.jumpReleased = Input.GetButtonUp("Jump");
 
         if (!isGrounded()) {
-
             if (_controller._colldata.above) _velocity.y = 0.01f;
             _stateMachine.ChangeStateTo(_fall_state);
         }
 
-        _coyoteTimer = (isGrounded()) ? _coyoteDuration : _coyoteTimer -= Time.deltaTime;
+        coyoteCounter = (isGrounded()) ? _coyoteTime : coyoteCounter -= Time.deltaTime;
+
         _stateMachine._currentState.Update();
     }
 
-    void FixedUpdate()
+    void FixedUpdate() 
     {
         _stateMachine._currentState.FixedUpdate();
         _controller.move(_velocity * Time.deltaTime);

@@ -11,7 +11,7 @@ public class PLayer : MonoBehaviour
     [SerializeField] float _coyoteTime;
     [SerializeField] float _restTime;
 
-    private float _coyoteTimer;
+    private float coyoteCounter;
     private float _restTimer;
 
     [Header("Jump")]
@@ -120,15 +120,15 @@ public class PLayer : MonoBehaviour
        ////_animator.SetFloat("_vertical", _playerInputs._inputs().y);
 
        // // Coyote Time
-       // _coyoteTimer = (_controller._colldata.below) ? _coyoteTime : _coyoteTimer-=Time.fixedDeltaTime;
+       // coyoteCounter = (_controller._colldata.below) ? _coyoteTime : coyoteCounter-=Time.fixedDeltaTime;
 
 
        // // Jump:
        // if (_state._jumpPressed)
        // {
-       //     if (_controller._colldata.below || _coyoteTimer >= 0.0f) {
+       //     if (_controller._colldata.below || coyoteCounter >= 0.0f) {
        //         _velocity.y = _maxJumpVelocity;
-       //         _coyoteTimer = 0.0f;
+       //         coyoteCounter = 0.0f;
        //         //_animator.SetBool("_isJumping", true);
        //     }
 
