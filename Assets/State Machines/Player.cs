@@ -17,8 +17,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float _jumpDuration;
     [SerializeField] float _coyoteTime;
     [SerializeField] float jumpBufferTime;
-    [SerializeField] private float _minJumpHeight;
-    [SerializeField] private float _maxJumpHeight;
+    [SerializeField] private float _jumpHeight;
     [SerializeField] private float _terminalVelocity;
     
     [SerializeField] float _accelerationTimeAirborne;
@@ -41,11 +40,12 @@ public class Player : MonoBehaviour
          public bool jumpReleased;
     } public PublicContext _context;
 
-    private float _maxJumpVelocity;
     [HideInInspector] public float coyoteCounter;
     [HideInInspector] public float _smooothfactorx;
 
     [HideInInspector] public float jumpBufferCounter;
+
+    private float _maxJumpVelocity;
 
     void Awake()
     {
@@ -63,10 +63,11 @@ public class Player : MonoBehaviour
     {
 
         // # applied gravity
-        _gravity = -(2 * _maxJumpHeight) / Mathf.Pow(_jumpDuration, 2);
+        _gravity = -(2 * _jumpHeight) / Mathf.Pow(_jumpDuration, 2);
         _maxJumpVelocity = Mathf.Abs(_gravity) * _jumpDuration;
 
-        _jump_state = new JumpState(this, _stateMachine, _maxJumpHeight, _jumpDuration, _maxJumpVelocity);
+
+        _jump_state = new JumpState(this, _stateMachine, _jumpHeight, _jumpDuration, _maxJumpVelocity);
         print("Gravity: [" + _gravity + "] || " + "Velocity: [" + _maxJumpVelocity + "]");
         _stateMachine.StartState(_fall_state);
     }
@@ -76,6 +77,8 @@ public class Player : MonoBehaviour
         // Jump input states
         _context.jumpRequest = Input.GetButtonDown("Jump");
         _context.jumpReleased = Input.GetButtonUp("Jump");
+        _stateMachine._currentState.Update();
+
 
         if (!isGrounded()) {
             if (_controller._colldata.above) _velocity.y = 0.01f;
@@ -91,7 +94,6 @@ public class Player : MonoBehaviour
         coyoteCounter = (isGrounded()) ? _coyoteTime : coyoteCounter -= Time.deltaTime;
         jumpBufferCounter = (_context.jumpRequest) ? jumpBufferTime : jumpBufferCounter -= Time.deltaTime;
 
-        _stateMachine._currentState.Update();
     }
 
     void FixedUpdate() 

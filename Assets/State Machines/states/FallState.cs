@@ -2,11 +2,13 @@ using UnityEngine;
 
 public class FallState : PlayerState
 {
+    private bool _jumpCut;
     private float _terminalMultiplier;
     private float _gravityModifier = 1.5f;
     private float _accelerationTimeAirborne = 0.05f;
 
-    public FallState(Player player, PlayerStateMachine state, float terminalMultiplier, float accelerationTimeAirborne) : base(player, state, PlayerStateList.Falling)
+    public FallState(Player player, PlayerStateMachine state, float terminalMultiplier, float accelerationTimeAirborne)
+        : base(player, state, PlayerStateList.Falling)
     {
         _terminalMultiplier = terminalMultiplier;
         _accelerationTimeAirborne = accelerationTimeAirborne;
@@ -14,6 +16,10 @@ public class FallState : PlayerState
 
     public override void Update()
     {
+        if (player._context.jumpReleased && player._velocity.y > 0f) {
+            _jumpCut = true;
+            return;
+        }
 
         // # run or idle
         if (player.isGrounded()) {
@@ -39,6 +45,11 @@ public class FallState : PlayerState
         // # it has a depecdency to the jump Height and duration
         var targetvelocity = player.GetAxisDirections().x * player._footSpeed;
         player._velocity.x = Mathf.SmoothDamp(player._velocity.x, targetvelocity, ref player._smooothfactorx, _accelerationTimeAirborne);
+
+        if (_jumpCut){
+            player._velocity.y *= 0.5f;
+            _jumpCut = false;
+        }
 
         // # terminal velocity
         var fallSpeed = (player._velocity.y < 0.0f) ? player._velocity.y + player._gravity * Time.fixedDeltaTime * _gravityModifier :
