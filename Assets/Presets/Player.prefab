@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2172005964093286732}
   - component: {fileID: 7072026275786351212}
   - component: {fileID: 1480422456467982231}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -171,7 +171,7 @@ MonoBehaviour:
   jumpBufferTime: 0.15
   _minJumpHeight: 0
   _maxJumpHeight: 6
-  _terminalVelocity: 30
+  _terminalVelocity: 35
   _accelerationTimeAirborne: 0.09
   _dashSpeed: 0
   _dashDuration: 0

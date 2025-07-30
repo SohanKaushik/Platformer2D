@@ -75,9 +75,6 @@ public class Player : MonoBehaviour
     {
         // Jump input states
         _context.jumpRequest = Input.GetButtonDown("Jump");
-        jumpBufferCounter = (_context.jumpRequest) ? jumpBufferTime : jumpBufferCounter -= Time.deltaTime;
-
-        //jumpHeld = Input.GetButton("Jump");
         _context.jumpReleased = Input.GetButtonUp("Jump");
 
         if (!isGrounded()) {
@@ -85,7 +82,14 @@ public class Player : MonoBehaviour
             _stateMachine.ChangeStateTo(_fall_state);
         }
 
+        // # this needs fixing in terms of code design
+        if (GameManager.instance.Notifications.death)
+        {
+            StartCoroutine(GameManager.instance.Respawn(0.4f, this.gameObject));
+        }
+
         coyoteCounter = (isGrounded()) ? _coyoteTime : coyoteCounter -= Time.deltaTime;
+        jumpBufferCounter = (_context.jumpRequest) ? jumpBufferTime : jumpBufferCounter -= Time.deltaTime;
 
         _stateMachine._currentState.Update();
     }

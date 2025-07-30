@@ -16,7 +16,15 @@ public class JumpState : PlayerState
 
     public override void OnEnter()
     {
-        Debug.Log(player.jumpBufferCounter);
         player._velocity.y = _maxJumpVelocity;
+    }
+
+    public override void Update()
+    {
+        if (player._velocity.y > 0)
+        {
+            Debug.Log("short");
+        }
+
     }
 }
