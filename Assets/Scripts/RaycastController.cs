@@ -3,8 +3,8 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider2D))]
 public abstract class RaycastController : MonoBehaviour
 {
-    protected int vraycount = 4;
-    protected int hraycount = 4;
+    protected int vraycount = 10;
+    protected int hraycount = 10;
 
     public RayOrigins _origins;
     public CollisionData _colldata;

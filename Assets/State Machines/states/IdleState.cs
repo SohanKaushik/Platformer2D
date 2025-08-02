@@ -9,13 +9,19 @@ public class IdleState : PlayerState {
 
     public override void OnEnter() {
         player._velocity.x = 0.0f;
-        player._velocity.y = -0.001f;
+        player._velocity.y = -0.001f; // applying minimal downward force 
         player._smooothfactorx = 0.0f;
     }
 
 
     public override void Update()
     {
+        // # dash
+        if (player._context.dashRequest) {
+            stateMachine.ChangeStateTo(player._dash_state);
+            return;
+        }
+
         // # jump 
         if (player.jumpBufferCounter > 0.0f) {
             stateMachine.ChangeStateTo(player._jump_state);

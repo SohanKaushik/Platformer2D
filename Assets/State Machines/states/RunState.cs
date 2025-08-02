@@ -20,6 +20,12 @@ public class RunState : PlayerState
 
     public override void Update()
     {
+        // # dash
+        if (player._context.dashRequest) {
+            stateMachine.ChangeStateTo(player._dash_state);
+            return;
+        }
+
         // # jump 
         if ((player._context.jumpRequest && player.coyoteCounter >= 0.0f) || player.jumpBufferCounter > 0.0f) { 
             stateMachine.ChangeStateTo(player._jump_state);

@@ -31,13 +31,15 @@ public class Player : MonoBehaviour
     public RunState _run_state;
     public JumpState _jump_state;
     public FallState _fall_state;
+    public DashState _dash_state;
 
     [HideInInspector] public Vector3 _velocity;
     [HideInInspector] public float _gravity = -1.0f;
 
     public struct PublicContext { 
-         public bool jumpRequest;
-         public bool jumpReleased;
+        public bool jumpRequest;
+        public bool jumpReleased;
+        public bool dashRequest;
     } public PublicContext _context;
 
     [HideInInspector] public float coyoteCounter;
@@ -55,6 +57,7 @@ public class Player : MonoBehaviour
 
 
         _idle_state = new IdleState(this, _stateMachine);
+        _dash_state = new DashState(this, _stateMachine, _dashSpeed, _dashDuration);
         _run_state = new RunState(this, _stateMachine, _footSpeed, _accelerationTimeGrounded);
         _fall_state = new FallState(this, _stateMachine, _terminalVelocity, _accelerationTimeAirborne);
     }
@@ -77,15 +80,18 @@ public class Player : MonoBehaviour
         // Jump input states
         _context.jumpRequest = Input.GetButtonDown("Jump");
         _context.jumpReleased = Input.GetButtonUp("Jump");
+
+        _context.dashRequest = Input.GetKeyDown(KeyCode.K);
         _stateMachine._currentState.Update();
 
 
-        if (!isGrounded()) {
+        if (!isGrounded() ) {
             if (_controller._colldata.above) _velocity.y = 0.01f;
+            if(_stateMachine._currentState != _fall_state)
             _stateMachine.ChangeStateTo(_fall_state);
         }
 
-        // # this needs fixing in terms of code design
+        // # totally hideous code here
         if (GameManager.instance.Notifications.death)
         {
             StartCoroutine(GameManager.instance.Respawn(0.4f, this.gameObject));

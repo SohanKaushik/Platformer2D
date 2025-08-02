@@ -16,6 +16,12 @@ public class FallState : PlayerState
 
     public override void Update()
     {
+        // # dash
+        if (player._context.dashRequest) {
+            stateMachine.ChangeStateTo(player._dash_state);
+            return;
+        }
+
         if (player._context.jumpReleased && player._velocity.y > 0f) {
             _jumpCut = true;
             return;
@@ -46,14 +52,23 @@ public class FallState : PlayerState
         var targetvelocity = player.GetAxisDirections().x * player._footSpeed;
         player._velocity.x = Mathf.SmoothDamp(player._velocity.x, targetvelocity, ref player._smooothfactorx, _accelerationTimeAirborne);
 
-        if (_jumpCut){
+        // # cuts jump short if jump was released early
+        if (_jumpCut) {
             player._velocity.y *= 0.5f;
             _jumpCut = false;
         }
 
-        // # terminal velocity
+        // # [0-peak] -> modified gravity :: [peak-ground] -> applied normal gravity
         var fallSpeed = (player._velocity.y < 0.0f) ? player._velocity.y + player._gravity * Time.fixedDeltaTime * _gravityModifier :
                          player._velocity.y + player._gravity * Time.fixedDeltaTime;
+
+        // # terminal velocity
         player._velocity.y = Mathf.Max(fallSpeed, -_terminalMultiplier);
+    }
+
+    public override void OnExit()
+    {
+        // # prevents accumulated y velocity to any other state
+        player._velocity.y = -0.001f;
     }
 }
