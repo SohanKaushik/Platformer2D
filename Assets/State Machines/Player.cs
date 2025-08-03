@@ -41,7 +41,7 @@ public class Player : MonoBehaviour
         public bool jumpRequest;
         public bool jumpReleased;
         public bool dashRequest;
-        public bool wallClimbRequest;
+        public bool wallClimbHoldRequest;
     } public PublicContext _context;
 
     [HideInInspector] public float coyoteCounter;
@@ -61,7 +61,7 @@ public class Player : MonoBehaviour
         _idle_state = new IdleState(this, _stateMachine);
         _dash_state = new DashState(this, _stateMachine, _dashSpeed, _dashDuration);
         _run_state = new RunState(this, _stateMachine, _footSpeed, _accelerationTimeGrounded);
-        _wall_climb_state = new WallClimbState(this, _stateMachine, PlayerStateList.WallClimbing);
+        _wall_climb_state = new WallClimbState(this, _stateMachine, PlayerStateList.Wall_Climbing);
         _fall_state = new FallState(this, _stateMachine, _terminalVelocity, _accelerationTimeAirborne);
     }
 
@@ -85,7 +85,6 @@ public class Player : MonoBehaviour
         _context.jumpReleased = Input.GetButtonUp("Jump");
 
         _context.dashRequest = Input.GetKeyDown(KeyCode.L);
-        _context.wallClimbRequest = Input.GetKeyDown(KeyCode.J);
         _stateMachine._currentState.Update();
 
 
@@ -104,8 +103,8 @@ public class Player : MonoBehaviour
         // [ Conditions ]
         coyoteCounter = (isGrounded()) ? _coyoteTime : coyoteCounter -= Time.deltaTime;
         jumpBufferCounter = (_context.jumpRequest) ? jumpBufferTime : jumpBufferCounter -= Time.deltaTime;
-        wallClimbAllowed = (_controller._colldata.right || _controller._colldata.left) && !isGrounded() ? true : false;
-
+        wallClimbAllowed = (_controller._colldata.right || _controller._colldata.left) 
+                            && !isGrounded() && _context.wallClimbHoldRequest ? true : false;
     }
 
     void FixedUpdate() 

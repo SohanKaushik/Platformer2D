@@ -47,9 +47,14 @@ public class FallState : PlayerState
         }
 
         // # wall jumping
-        if (player.wallClimbAllowed) { 
-            //stateMachine.ChangeStateTo(player._wall_climb_state);
-            //return;
+        if (player.wallClimbAllowed && player._context.wallClimbHoldRequest)  {
+            stateMachine.ChangeStateTo(player._wall_climb_state);
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            player._context.wallClimbHoldRequest = true;
         }
     }
 
