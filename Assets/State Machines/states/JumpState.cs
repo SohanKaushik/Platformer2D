@@ -19,4 +19,11 @@ public class JumpState : PlayerState
     {
         player._velocity.y = _maxJumpVelocity;
     }
+
+    public override void OnExit()
+    {
+        if (player.wallClimbAllowed) {
+            stateMachine.ChangeStateTo(player._wall_climb_state);
+        }
+    }
 }

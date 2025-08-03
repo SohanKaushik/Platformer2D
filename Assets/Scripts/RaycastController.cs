@@ -3,14 +3,14 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider2D))]
 public abstract class RaycastController : MonoBehaviour
 {
-    protected int vraycount = 10;
-    protected int hraycount = 10;
+    protected int vraycount = 4;
+    protected int hraycount = 4;
 
     public RayOrigins _origins;
     public CollisionData _colldata;
 
     private BoxCollider2D _collider;
-    protected float skinWidth = 0.015f;
+    protected float skinWidth = 0.1f;
     protected float vraySpacing, hraySpacing;
 
     public virtual void Start()

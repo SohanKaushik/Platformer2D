@@ -18,14 +18,13 @@ public class Controller2D : RaycastController {
         _colldata.reset();
 
 
-        if(velocity.x != 0)
-        {
+        if(velocity.x != 0) {
             _colldata.direction = (int)Mathf.Sign(velocity.x);
         }
 
         HorizontalCollision(ref velocity);
-        if (velocity.y != 0) {
-            VerticalCollision(ref velocity);
+        VerticalCollision(ref velocity);
+        if (velocity.y !< 0.1) {
         }
 
         // [] Flip

@@ -32,7 +32,8 @@ public class Player : MonoBehaviour
     public JumpState _jump_state;
     public FallState _fall_state;
     public DashState _dash_state;
-
+    public WallClimbState _wall_climb_state;
+    
     [HideInInspector] public Vector3 _velocity;
     [HideInInspector] public float _gravity = -1.0f;
 
@@ -40,12 +41,14 @@ public class Player : MonoBehaviour
         public bool jumpRequest;
         public bool jumpReleased;
         public bool dashRequest;
+        public bool wallClimbRequest;
     } public PublicContext _context;
 
     [HideInInspector] public float coyoteCounter;
     [HideInInspector] public float _smooothfactorx;
 
     [HideInInspector] public float jumpBufferCounter;
+    [HideInInspector] public bool wallClimbAllowed;
 
     private float _maxJumpVelocity;
 
@@ -55,10 +58,10 @@ public class Player : MonoBehaviour
         _controller = GetComponent<Controller2D>();
 
 
-
         _idle_state = new IdleState(this, _stateMachine);
         _dash_state = new DashState(this, _stateMachine, _dashSpeed, _dashDuration);
         _run_state = new RunState(this, _stateMachine, _footSpeed, _accelerationTimeGrounded);
+        _wall_climb_state = new WallClimbState(this, _stateMachine, PlayerStateList.WallClimbing);
         _fall_state = new FallState(this, _stateMachine, _terminalVelocity, _accelerationTimeAirborne);
     }
 
@@ -81,13 +84,14 @@ public class Player : MonoBehaviour
         _context.jumpRequest = Input.GetButtonDown("Jump");
         _context.jumpReleased = Input.GetButtonUp("Jump");
 
-        _context.dashRequest = Input.GetKeyDown(KeyCode.K);
+        _context.dashRequest = Input.GetKeyDown(KeyCode.L);
+        _context.wallClimbRequest = Input.GetKeyDown(KeyCode.J);
         _stateMachine._currentState.Update();
 
 
         if (!isGrounded() ) {
             if (_controller._colldata.above) _velocity.y = 0.01f;
-            if(_stateMachine._currentState != _fall_state)
+            if(_stateMachine._currentState != _fall_state && !wallClimbAllowed)
             _stateMachine.ChangeStateTo(_fall_state);
         }
 
@@ -97,8 +101,10 @@ public class Player : MonoBehaviour
             StartCoroutine(GameManager.instance.Respawn(0.4f, this.gameObject));
         }
 
+        // [ Conditions ]
         coyoteCounter = (isGrounded()) ? _coyoteTime : coyoteCounter -= Time.deltaTime;
         jumpBufferCounter = (_context.jumpRequest) ? jumpBufferTime : jumpBufferCounter -= Time.deltaTime;
+        wallClimbAllowed = (_controller._colldata.right || _controller._colldata.left) && !isGrounded() ? true : false;
 
     }
 

@@ -2,5 +2,5 @@ using UnityEngine;
 
 public enum PlayerStateList
 {
-    Idle, Running, Jumping, Falling, Dashing
+    Idle, Running, Jumping, Falling, Dashing, WallClimbing
 }

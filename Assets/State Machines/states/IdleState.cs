@@ -25,6 +25,7 @@ public class IdleState : PlayerState {
         // # jump 
         if (player.jumpBufferCounter > 0.0f) {
             stateMachine.ChangeStateTo(player._jump_state);
+           
             return;
         }
     }

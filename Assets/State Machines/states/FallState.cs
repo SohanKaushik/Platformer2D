@@ -16,6 +16,7 @@ public class FallState : PlayerState
 
     public override void Update()
     {
+
         // # dash
         if (player._context.dashRequest) {
             stateMachine.ChangeStateTo(player._dash_state);
@@ -43,6 +44,12 @@ public class FallState : PlayerState
         if (player._context.jumpRequest && player.coyoteCounter >= 0.0f) {
             stateMachine.ChangeStateTo(player._jump_state);
             return;
+        }
+
+        // # wall jumping
+        if (player.wallClimbAllowed) { 
+            //stateMachine.ChangeStateTo(player._wall_climb_state);
+            //return;
         }
     }
 
