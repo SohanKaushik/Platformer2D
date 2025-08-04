@@ -37,7 +37,7 @@ public class DashState : PlayerState
         Vector2 inputDir = player.GetAxisDirections();
         _dashDirection = inputDir.magnitude > 0.1f
             ? inputDir.normalized
-            : new Vector2(player._controller._colldata.direction, 0);
+            : new Vector2(player.GetDireciton(), 0);
 
 
         yield return new WaitForSeconds(_dashDuration);

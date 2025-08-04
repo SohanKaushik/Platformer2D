@@ -3,13 +3,12 @@ using UnityEngine;
 using UnityEngine.Assertions.Must;
 using UnityEngine.Rendering;
 
-[RequireComponent(typeof(Controller2D))]
+[RequireComponent(typeof(Controller2D), typeof(PlayerInputSystem))]
 public class Player : MonoBehaviour
 {
     [Header("Walk")]
     public float _footSpeed;
     [HideInInspector] public PlayerStateMachine _stateMachine;
-    [HideInInspector] public Controller2D _controller;
     [SerializeField] float _accelerationTimeGrounded;
 
 
@@ -51,12 +50,14 @@ public class Player : MonoBehaviour
     [HideInInspector] public bool wallClimbAllowed;
 
     private float _maxJumpVelocity;
+    private Controller2D _controller;
+    private PlayerInputSystem _inputhandler;
 
     void Awake()
     {
         _stateMachine = new PlayerStateMachine();
         _controller = GetComponent<Controller2D>();
-
+        _inputhandler = GetComponent<PlayerInputSystem>();
 
         _idle_state = new IdleState(this, _stateMachine);
         _dash_state = new DashState(this, _stateMachine, _dashSpeed, _dashDuration);
@@ -84,9 +85,7 @@ public class Player : MonoBehaviour
         _context.jumpRequest = Input.GetButtonDown("Jump");
         _context.jumpReleased = Input.GetButtonUp("Jump");
 
-        _context.dashRequest = Input.GetKeyDown(KeyCode.L);
         _stateMachine._currentState.Update();
-
 
         if (!isGrounded() ) {
             if (_controller._colldata.above) _velocity.y = 0.01f;
@@ -104,7 +103,7 @@ public class Player : MonoBehaviour
         coyoteCounter = (isGrounded()) ? _coyoteTime : coyoteCounter -= Time.deltaTime;
         jumpBufferCounter = (_context.jumpRequest) ? jumpBufferTime : jumpBufferCounter -= Time.deltaTime;
         wallClimbAllowed = (_controller._colldata.right || _controller._colldata.left) 
-                            && !isGrounded() && _context.wallClimbHoldRequest ? true : false;
+                            && !isGrounded() && _inputhandler.IsWallClimbHeld() ? true : false;
     }
 
     void FixedUpdate() 
@@ -115,10 +114,12 @@ public class Player : MonoBehaviour
 
     public Vector2 GetAxisDirections()
     {
-        return new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        return _inputhandler.GetMoveInput();
     }
 
+    public int GetDireciton() => _controller._colldata.direction;
     public bool isGrounded() => _controller._colldata.below;
+    public PlayerInputSystem PlayerInputManager() => _inputhandler;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {

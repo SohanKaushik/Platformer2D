@@ -11,6 +11,7 @@ public class IdleState : PlayerState {
         player._velocity.x = 0.0f;
         player._velocity.y = -0.001f; // applying minimal downward force 
         player._smooothfactorx = 0.0f;
+
     }
 
 

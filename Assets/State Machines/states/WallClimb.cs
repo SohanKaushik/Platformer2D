@@ -18,20 +18,16 @@ public class WallClimbState : PlayerState
 
     public override void Update()
     {
-        if (Input.GetKeyUp(KeyCode.K)){
-            player._context.wallClimbHoldRequest = false;
-        }
-
         // # jump
-        if (player._context.jumpRequest) {
+        if (player.PlayerInputManager().HasJumped()) {
             _wallJumped = true;
         }
     }
 
     public override void FixedUpdate()
     {
-        if (_wallJumped) { 
-            player._velocity = wallJumpForce;
+        if (_wallJumped) {
+            player._velocity = new Vector2(-player.GetDireciton() * wallJumpForce.x, wallJumpForce.y);
             return;
         }
        player._velocity.y = player.GetAxisDirections().y * wallCrawlSpeed;
