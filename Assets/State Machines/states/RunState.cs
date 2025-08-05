@@ -37,6 +37,13 @@ public class RunState : PlayerState
             stateMachine.ChangeStateTo(player._idle_state);
             return;
         }
+
+        // # wall climbing
+        if (player.IsWallClimbAllowed())
+        {
+            stateMachine.ChangeStateTo(player._wall_climb_state);
+            return;
+        }
     }
 
     public override void FixedUpdate()

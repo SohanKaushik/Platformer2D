@@ -2118,12 +2118,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4463282044344758504, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4463282044344758504, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: inputActionsAsset
       value: 
       objectReference: {fileID: -944628639613478452, guid: f0de048ea549cc042b57feb7caeb7a0b, type: 3}
+    - target: {fileID: 4463282044344758504, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
+      propertyPath: moveAction.m_Name
+      value: Move
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

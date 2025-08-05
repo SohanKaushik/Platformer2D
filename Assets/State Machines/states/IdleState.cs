@@ -12,6 +12,8 @@ public class IdleState : PlayerState {
         player._velocity.y = -0.001f; // applying minimal downward force 
         player._smooothfactorx = 0.0f;
 
+        //._wallClimbTimeout = false;
+        player.GetComponent<SpriteRenderer>().color = Color.white;  
     }
 
 
@@ -26,7 +28,12 @@ public class IdleState : PlayerState {
         // # jump 
         if (player.jumpBufferCounter > 0.0f) {
             stateMachine.ChangeStateTo(player._jump_state);
-           
+            return;
+        }
+
+        // # wall climbing
+        if (player.IsWallClimbAllowed()) {
+            stateMachine.ChangeStateTo(player._wall_climb_state);
             return;
         }
     }

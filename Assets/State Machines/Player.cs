@@ -47,7 +47,10 @@ public class Player : MonoBehaviour
     [HideInInspector] public float _smooothfactorx;
 
     [HideInInspector] public float jumpBufferCounter;
-    [HideInInspector] public bool wallClimbAllowed;
+
+    [HideInInspector] public bool _wallClimbTimeout;
+    [HideInInspector] public float wallClimbTimer;
+    private float wallClimbDuration;
 
     private float _maxJumpVelocity;
     private Controller2D _controller;
@@ -62,7 +65,7 @@ public class Player : MonoBehaviour
         _idle_state = new IdleState(this, _stateMachine);
         _dash_state = new DashState(this, _stateMachine, _dashSpeed, _dashDuration);
         _run_state = new RunState(this, _stateMachine, _footSpeed, _accelerationTimeGrounded);
-        _wall_climb_state = new WallClimbState(this, _stateMachine, PlayerStateList.Wall_Climbing);
+        _wall_climb_state = new WallClimbState(this, _stateMachine, PlayerStateList.Wall_Climbing, 5.0f);
         _fall_state = new FallState(this, _stateMachine, _terminalVelocity, _accelerationTimeAirborne);
     }
 
@@ -89,7 +92,7 @@ public class Player : MonoBehaviour
 
         if (!isGrounded() ) {
             if (_controller._colldata.above) _velocity.y = 0.01f;
-            if(_stateMachine._currentState != _fall_state && !wallClimbAllowed)
+            if(_stateMachine._currentState != _fall_state && !IsWallClimbAllowed())
             _stateMachine.ChangeStateTo(_fall_state);
         }
 
@@ -102,8 +105,9 @@ public class Player : MonoBehaviour
         // [ Conditions ]
         coyoteCounter = (isGrounded()) ? _coyoteTime : coyoteCounter -= Time.deltaTime;
         jumpBufferCounter = (_context.jumpRequest) ? jumpBufferTime : jumpBufferCounter -= Time.deltaTime;
-        wallClimbAllowed = (_controller._colldata.right || _controller._colldata.left) 
-                            && !isGrounded() && _inputhandler.IsWallClimbHeld() ? true : false;
+
+        //wallClimbTimer = (IsWallClimbing()) ? wallClimbTimer -= Time.deltaTime : wallClimbTimer = wallClimbDuration;
+        //wallClimbAllowed = IsWallClimbAllowed();
     }
 
     void FixedUpdate() 
@@ -120,6 +124,16 @@ public class Player : MonoBehaviour
     public int GetDireciton() => _controller._colldata.direction;
     public bool isGrounded() => _controller._colldata.below;
     public PlayerInputSystem PlayerInputManager() => _inputhandler;
+
+    public bool IsWallClimbAllowed() {
+        return (_controller._colldata.right || _controller._colldata.left)
+         && !_wallClimbTimeout
+         && PlayerInputManager().IsWallClimbHeld();
+    }
+
+    public bool IsWallClimbing(){
+        return (_stateMachine._currentState == _wall_climb_state) ? true : false;
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {

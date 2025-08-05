@@ -27,7 +27,7 @@ public class PlayerInputSystem : MonoBehaviour
         jumpAction.Enable();
         wallClimbAction.Enable();
 
-        jumpAction.performed += OnJump;
+        jumpAction.performed += OnJumpTapped;
         jumpAction.canceled += OnJumpReleased; 
 
         wallClimbAction.started += OnClimbStarted;
@@ -36,7 +36,7 @@ public class PlayerInputSystem : MonoBehaviour
 
     private void OnDisable()
     {
-        jumpAction.performed -= OnJump;
+        jumpAction.performed -= OnJumpTapped;
         jumpAction.canceled -= OnJumpReleased;
 
         wallClimbAction.started -= OnClimbStarted;
@@ -53,7 +53,7 @@ public class PlayerInputSystem : MonoBehaviour
     }
 
     // # jump
-    private void OnJump(InputAction.CallbackContext context) => _context.jumpRequest = true;
+    private void OnJumpTapped(InputAction.CallbackContext context) => _context.jumpRequest = true;
     private void OnJumpReleased(InputAction.CallbackContext context) => _context.jumpRequest = false;
 
     // # wall climbing 

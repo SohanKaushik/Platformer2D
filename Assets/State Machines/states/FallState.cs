@@ -30,7 +30,6 @@ public class FallState : PlayerState
 
         // # run or idle
         if (player.isGrounded()) {
-
             if (Mathf.Abs(player.GetAxisDirections().x) > 0.1f) {
                 stateMachine.ChangeStateTo(player._run_state);
             }
@@ -47,7 +46,7 @@ public class FallState : PlayerState
         }
 
         // # wall jumping
-        if (player.wallClimbAllowed)  {
+        if (player.IsWallClimbAllowed())  {
             stateMachine.ChangeStateTo(player._wall_climb_state);
             return;
         }

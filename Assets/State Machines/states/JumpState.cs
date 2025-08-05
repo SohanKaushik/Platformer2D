@@ -22,8 +22,9 @@ public class JumpState : PlayerState
 
     public override void OnExit()
     {
-        if (player.wallClimbAllowed) {
+        if (player.IsWallClimbAllowed()) {
             stateMachine.ChangeStateTo(player._wall_climb_state);
+            return;
         }
     }
 }
