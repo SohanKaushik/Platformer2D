@@ -12,7 +12,7 @@ public class IdleState : PlayerState {
         player._velocity.y = -0.001f; // applying minimal downward force 
         player._smooothfactorx = 0.0f;
 
-        //._wallClimbTimeout = false;
+        player._wallClimbTimeout = false;
         player.GetComponent<SpriteRenderer>().color = Color.white;  
     }
 
@@ -39,6 +39,7 @@ public class IdleState : PlayerState {
     }
 
     public override void FixedUpdate() {
+
         // # run
         if (Mathf.Abs(player.GetAxisDirections().x) > 0.1f) {
             stateMachine.ChangeStateTo(player._run_state);

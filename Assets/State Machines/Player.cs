@@ -37,8 +37,6 @@ public class Player : MonoBehaviour
     [HideInInspector] public float _gravity = -1.0f;
 
     public struct PublicContext { 
-        public bool jumpRequest;
-        public bool jumpReleased;
         public bool dashRequest;
         public bool wallClimbHoldRequest;
     } public PublicContext _context;
@@ -50,7 +48,9 @@ public class Player : MonoBehaviour
 
     [HideInInspector] public bool _wallClimbTimeout;
     [HideInInspector] public float wallClimbTimer;
-    private float wallClimbDuration;
+
+    [Header("Wall Climb")]
+    public float wallClimbDuration;
 
     private float _maxJumpVelocity;
     private Controller2D _controller;
@@ -78,16 +78,12 @@ public class Player : MonoBehaviour
 
 
         _jump_state = new JumpState(this, _stateMachine, _jumpHeight, _jumpDuration, _maxJumpVelocity);
-        print("Gravity: [" + _gravity + "] || " + "Velocity: [" + _maxJumpVelocity + "]");
+        print("Gravity: [" + _gravity + "] , " + "Velocity: [" + _maxJumpVelocity + "]");
         _stateMachine.StartState(_fall_state);
     }
 
     private void Update()
     {
-        // Jump input states
-        _context.jumpRequest = Input.GetButtonDown("Jump");
-        _context.jumpReleased = Input.GetButtonUp("Jump");
-
         _stateMachine._currentState.Update();
 
         if (!isGrounded() ) {
@@ -104,10 +100,9 @@ public class Player : MonoBehaviour
 
         // [ Conditions ]
         coyoteCounter = (isGrounded()) ? _coyoteTime : coyoteCounter -= Time.deltaTime;
-        jumpBufferCounter = (_context.jumpRequest) ? jumpBufferTime : jumpBufferCounter -= Time.deltaTime;
+        jumpBufferCounter = (PlayerInputManager().OnJumpTapped()) ? jumpBufferTime : jumpBufferCounter -= Time.deltaTime;
 
-        //wallClimbTimer = (IsWallClimbing()) ? wallClimbTimer -= Time.deltaTime : wallClimbTimer = wallClimbDuration;
-        //wallClimbAllowed = IsWallClimbAllowed();
+        wallClimbTimer = (IsWallClimbing()) ? wallClimbTimer -= Time.deltaTime : wallClimbTimer = wallClimbDuration;
     }
 
     void FixedUpdate() 
@@ -121,9 +116,9 @@ public class Player : MonoBehaviour
         return _inputhandler.GetMoveInput();
     }
 
+    public PlayerInputSystem PlayerInputManager() => _inputhandler;
     public int GetDireciton() => _controller._colldata.direction;
     public bool isGrounded() => _controller._colldata.below;
-    public PlayerInputSystem PlayerInputManager() => _inputhandler;
 
     public bool IsWallClimbAllowed() {
         return (_controller._colldata.right || _controller._colldata.left)
@@ -137,8 +132,7 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Hazard"))
-        {
+        if (collision.CompareTag("Hazard")) {
             GameManager.instance.NotifyDeath();
             StartCoroutine(GameManager.instance.Respawn(1.10f, this.gameObject));
         }

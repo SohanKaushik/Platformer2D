@@ -23,7 +23,7 @@ public class FallState : PlayerState
             return;
         }
 
-        if (player._context.jumpReleased && player._velocity.y > 0f) {
+        if (player.PlayerInputManager().OnJumpReleased() && player._velocity.y > 0f) {
             _jumpCut = true;
             return;
         }
@@ -40,7 +40,7 @@ public class FallState : PlayerState
         }
 
         // # jump
-        if (player._context.jumpRequest && player.coyoteCounter >= 0.0f) {
+        if (player.PlayerInputManager().OnJumpTapped() && player.coyoteCounter >= 0.0f) {
             stateMachine.ChangeStateTo(player._jump_state);
             return;
         }

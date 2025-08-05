@@ -25,18 +25,17 @@ public class WallClimbState : PlayerState
     {
         // # jump
         if (player.PlayerInputManager().OnJumpTapped()) {
-            //Debug.Log("holed");
             _wallJumped = true;
         }
 
 
-        //if(player.wallClimbTimer < 0) { 
-        //    player._wallClimbTimeout = true;
+        if(player.wallClimbTimer < 0) { 
+            player._wallClimbTimeout = true;
 
-        //    player.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
-        //    stateMachine.ChangeStateTo(player._fall_state);
-        //    return;
-        //}
+            player.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+            stateMachine.ChangeStateTo(player._fall_state);
+            return;
+        }
     }
 
     public override void FixedUpdate()
@@ -49,7 +48,7 @@ public class WallClimbState : PlayerState
         if (_wallJumped) {
             _wallJumped = false;
 
-            player._velocity = (Mathf.Abs(player.GetAxisDirections().x) > 0.1) ? 
+            player._velocity = (Mathf.Abs(direciton.x) > 0.1) ? 
                 new Vector2(-player.GetDireciton() * wallJumpForce.x, wallJumpForce.y) :
                 new Vector2(0, 20);
             return;

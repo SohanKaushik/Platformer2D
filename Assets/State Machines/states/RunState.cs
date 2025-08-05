@@ -8,7 +8,8 @@ public class RunState : PlayerState
     private float _accelerationTimeGrounded = 0.05f;
 
     // [] Player -> Run State -> Player State ( protected variables )
-    public RunState(Player player, PlayerStateMachine state, float speed, float accelerationTimeGrounded) : base(player, state, PlayerStateList.Running) { 
+    public RunState(Player player, PlayerStateMachine state, float speed, float accelerationTimeGrounded) 
+        : base(player, state, PlayerStateList.Running) { 
         _footSpeed = speed;
         _accelerationTimeGrounded = accelerationTimeGrounded;
     }
@@ -27,7 +28,7 @@ public class RunState : PlayerState
         }
 
         // # jump 
-        if ((player._context.jumpRequest && player.coyoteCounter >= 0.0f) || player.jumpBufferCounter > 0.0f) { 
+        if ((player.PlayerInputManager().OnJumpTapped() && player.coyoteCounter >= 0.0f) || player.jumpBufferCounter > 0.0f) { 
             stateMachine.ChangeStateTo(player._jump_state);
             return;
         }
@@ -39,8 +40,7 @@ public class RunState : PlayerState
         }
 
         // # wall climbing
-        if (player.IsWallClimbAllowed())
-        {
+        if (player.IsWallClimbAllowed()) {
             stateMachine.ChangeStateTo(player._wall_climb_state);
             return;
         }
@@ -49,6 +49,9 @@ public class RunState : PlayerState
     public override void FixedUpdate()
     {
         var targetvelocity = player.GetAxisDirections().x * _footSpeed;
-        player._velocity.x = Mathf.SmoothDamp(player._velocity.x, targetvelocity, ref player._smooothfactorx, _accelerationTimeGrounded);
+        player._velocity.x = Mathf.SmoothDamp(
+                                                 player._velocity.x, targetvelocity,
+                                                 ref player._smooothfactorx,
+                                                 _accelerationTimeGrounded);
     }
 }
