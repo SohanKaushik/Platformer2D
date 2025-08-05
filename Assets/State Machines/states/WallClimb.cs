@@ -24,7 +24,7 @@ public class WallClimbState : PlayerState
     public override void Update()
     {
         // # jump
-        if (player.PlayerInputManager().HasJumped()) {
+        if (player.PlayerInputManager().OnJumpTapped()) {
             //Debug.Log("holed");
             _wallJumped = true;
         }

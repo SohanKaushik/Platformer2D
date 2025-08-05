@@ -10,10 +10,18 @@ public class PlayerInputSystem : MonoBehaviour
     private InputAction wallClimbAction;
 
     public struct RequestContext {
+        public bool jumpHeld;
         public bool jumpRequest;
+        public bool jumpReleased;
+
         public bool dashRequest;
         public bool wallClimbHoldRequest;
     } private RequestContext _context;
+
+
+    private bool jumpPressedThisFrame;
+    private bool jumpReleasedThisFrame;
+    private bool jumpHeld;
 
     private void OnEnable()
     {
@@ -27,7 +35,7 @@ public class PlayerInputSystem : MonoBehaviour
         jumpAction.Enable();
         wallClimbAction.Enable();
 
-        jumpAction.performed += OnJumpTapped;
+        jumpAction.started += OnJumpTapped;
         jumpAction.canceled += OnJumpReleased; 
 
         wallClimbAction.started += OnClimbStarted;
@@ -36,7 +44,7 @@ public class PlayerInputSystem : MonoBehaviour
 
     private void OnDisable()
     {
-        jumpAction.performed -= OnJumpTapped;
+        jumpAction.started -= OnJumpTapped;
         jumpAction.canceled -= OnJumpReleased;
 
         wallClimbAction.started -= OnClimbStarted;
@@ -53,14 +61,33 @@ public class PlayerInputSystem : MonoBehaviour
     }
 
     // # jump
-    private void OnJumpTapped(InputAction.CallbackContext context) => _context.jumpRequest = true;
-    private void OnJumpReleased(InputAction.CallbackContext context) => _context.jumpRequest = false;
+    private void OnJumpTapped(InputAction.CallbackContext context)
+    {
+        jumpPressedThisFrame = true;
+        jumpHeld = true;
+    }
+
+    private void OnJumpReleased(InputAction.CallbackContext context)
+    {
+        jumpReleasedThisFrame = true;
+        jumpHeld = false;
+    }
 
     // # wall climbing 
     private void OnClimbStarted(InputAction.CallbackContext context) => _context.wallClimbHoldRequest = true;
     private void OnClimbCanceled(InputAction.CallbackContext context) => _context.wallClimbHoldRequest = false;
 
-    // # receivers ->
+    // # get ;
     public bool IsWallClimbHeld() => _context.wallClimbHoldRequest;
-    public bool HasJumped() => _context.jumpRequest; 
+
+    public bool OnJumpReleased() => jumpReleasedThisFrame;
+    public bool OnJumpTapped() => jumpPressedThisFrame;
+    public bool OnJumpHeld() => jumpHeld;
+
+
+    private void LateUpdate()
+    {
+        jumpPressedThisFrame = false;
+        jumpReleasedThisFrame = false;
+    }
 }
