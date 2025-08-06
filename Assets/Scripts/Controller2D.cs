@@ -1,7 +1,6 @@
-using NUnit.Framework;
-using System;
-using System.Data.Common;
-using Unity.VisualScripting;
+// summary//
+// this player controller has been followed by video made by sabastian lague.//
+
 using UnityEngine;
 
 public class Controller2D : RaycastController {
