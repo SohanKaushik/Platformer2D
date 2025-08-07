@@ -82,12 +82,14 @@ public class Controller2D : RaycastController {
                 velocity.x = (hit.distance - skinWidth) * directionX;
                 raylength = hit.distance;
 
+
                 _colldata.right = directionX == 1;
                 _colldata.left = directionX == -1;
             }
 
             Debug.DrawRay(rayo, Vector2.right * directionX * raylength, Color.blue);
         }
+
     }
 }
 

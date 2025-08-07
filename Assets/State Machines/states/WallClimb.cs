@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using static UnityEngine.RuleTile.TilingRuleOutput;
@@ -37,8 +38,6 @@ public class WallClimbState : PlayerState
             stateMachine.ChangeStateTo(player._fall_state);
             return;
         }
-
-        Debug.Log(HasReachedClimbTopEdge());
     }
 
     public override void FixedUpdate()
@@ -56,28 +55,47 @@ public class WallClimbState : PlayerState
                 new Vector2(0, 70);
             return;
         }
-       player._velocity.y = (direciton.y > 0.1) ? 
+
+        if (HasReachedClimbTopEdge())
+        {
+            player._velocity = new Vector3(
+                                                player.GetDireciton() * 10,
+                                                20,
+                                                0);
+            return;
+        }
+        player._velocity.y = (direciton.y > 0.1) ? 
                upwardForce:
                downwardForce;
     }
 
-    bool HasReachedClimbTopEdge()
+    private bool HasReachedClimbTopEdge()
     {
-        float wallCheckDistance = 0.1f;
-        float verticalOffset = 0.5f;
+        Collider2D col = player.GetComponent<Collider2D>();
+        if (col == null) return false;
 
-        // Origin: in front of player, slightly above their head
-        Vector2 origin = (Vector2)player.transform.position + new Vector2((player.GetDireciton() == 1) ? wallCheckDistance : -wallCheckDistance, verticalOffset);
+        float distance = 0.08f;
+        float offset = 1f;
+        Vector2 direction = new Vector2(player.GetDireciton(), 0);
+        int layerMask = LayerMask.GetMask("Obstacles");
 
-        // Ray direction: check horizontally to see if wall continues
-        Vector2 direction = (player.GetDireciton() == 1) ? Vector2.right : Vector2.left;
+        bool facingRight = player.GetDireciton() == 1;
 
-        RaycastHit2D wallHit = Physics2D.Raycast(origin, direction, wallCheckDistance);
+        Vector2 top = facingRight
+            ? new Vector2(col.bounds.max.x, col.bounds.max.y - offset)
+            : new Vector2(col.bounds.min.x, col.bounds.max.y - offset);
 
-        Debug.DrawRay(origin, direction * wallCheckDistance, Color.red);
+        Vector2 bottom = facingRight
+            ? new Vector2(col.bounds.max.x, col.bounds.min.y)
+            : new Vector2(col.bounds.min.x, col.bounds.min.y);
 
-        return wallHit.collider == null; // No wall? Then it's the top edge.
+        RaycastHit2D topHit = Physics2D.Raycast(top, direction, distance, layerMask);
+        RaycastHit2D bottomHit = Physics2D.Raycast(bottom, direction, distance, layerMask);
+
+        Debug.DrawRay(top, direction * distance, Color.cyan);
+        Debug.DrawRay(bottom, direction * distance, Color.cyan);
+
+        return (!topHit && bottomHit);
     }
-
 
 }
