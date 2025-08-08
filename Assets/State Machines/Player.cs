@@ -51,6 +51,9 @@ public class Player : MonoBehaviour
 
     [Header("Wall Climb")]
     public float wallClimbDuration;
+    public float wallClimbUpSpeed;
+    public float wallClimbDownSpeed;
+    public Vector2 wallHopOffForce;
 
     private float _maxJumpVelocity;
     private Controller2D _controller;
@@ -65,7 +68,7 @@ public class Player : MonoBehaviour
         _idle_state = new IdleState(this, _stateMachine);
         _dash_state = new DashState(this, _stateMachine, _dashSpeed, _dashDuration);
         _run_state = new RunState(this, _stateMachine, _footSpeed, _accelerationTimeGrounded);
-        _wall_climb_state = new WallClimbState(this, _stateMachine, PlayerStateList.Wall_Climbing, 5.0f);
+        _wall_climb_state = new WallClimbState(this, _stateMachine, PlayerStateList.Wall_Climbing, wallClimbUpSpeed, wallClimbDownSpeed, wallHopOffForce);
         _fall_state = new FallState(this, _stateMachine, _terminalVelocity, _accelerationTimeAirborne);
     }
 

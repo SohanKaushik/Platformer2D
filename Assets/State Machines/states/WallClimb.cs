@@ -1,26 +1,29 @@
-using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class WallClimbState : PlayerState
 {
-    private float wallCrawlSpeed = 5.0f;
-    private Vector2 wallJumpForce = new Vector2(30, 40);
+    private Vector2 _wallJumpForce = new Vector2(30, 40);
 
     private bool _wallJumped;
-    private float wallClimbDuration;
-    private int climbSpeed = 2;
+    private float _climbUpSpeed;
+    private float _climbDownSpeed;
 
+
+    private Vector2 _nudgePushAtEdge;
     private Vector2 direciton;
-    public WallClimbState(Player player, PlayerStateMachine state, PlayerStateList name, float duration) : base(player, state, name)
+
+    public WallClimbState(Player player, PlayerStateMachine state, PlayerStateList name, float climpUpSpeed, float climbDownSpeed, Vector2 wallHopOff)
+        : base(player, state, name)
     {
-        wallClimbDuration = duration;
+        _climbUpSpeed = climpUpSpeed;
+        _climbDownSpeed = climbDownSpeed;
+        _wallJumpForce = wallHopOff;
     }
 
     public override void OnEnter()
     {
         player._velocity = Vector3.zero;
+        _nudgePushAtEdge = new Vector2 (player.GetDireciton() * 10f, 20);
     }
 
     public override void Update()
@@ -44,24 +47,20 @@ public class WallClimbState : PlayerState
     {
         direciton = new Vector2((player.GetAxisDirections().x), (player.GetAxisDirections().y));
 
-        var downwardForce = 20.0f * direciton.y;
-        var upwardForce = 5.0f * direciton.y;
+        var downwardForce = _climbDownSpeed * direciton.y;
+        var upwardForce = _climbUpSpeed * direciton.y;
 
         if (_wallJumped) {
             _wallJumped = false;
 
             player._velocity = (Mathf.Abs(direciton.x) > 0.1) ? 
-                new Vector2(-player.GetDireciton() * wallJumpForce.x, wallJumpForce.y) :
+                new Vector2(-player.GetDireciton() * _wallJumpForce.x, _wallJumpForce.y) :
                 new Vector2(0, 70);
             return;
         }
 
-        if (HasReachedClimbTopEdge())
-        {
-            player._velocity = new Vector3(
-                                                player.GetDireciton() * 10,
-                                                20,
-                                                0);
+        if (HasReachedClimbTopEdge()) {
+            player._velocity = _nudgePushAtEdge;
             return;
         }
         player._velocity.y = (direciton.y > 0.1) ? 
