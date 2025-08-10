@@ -126,7 +126,8 @@ public class Player : MonoBehaviour
     public bool IsWallClimbAllowed() {
         return (_controller._colldata.right || _controller._colldata.left)
          && !_wallClimbTimeout
-         && PlayerInputManager().IsWallClimbHeld();
+         && PlayerInputManager().IsWallClimbHeld()
+         && !_controller._colldata.climbingSlope;
     }
 
     public bool IsWallClimbing(){

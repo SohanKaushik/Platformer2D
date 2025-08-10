@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(BoxCollider2D))]
@@ -10,7 +11,7 @@ public abstract class RaycastController : MonoBehaviour
     public CollisionData _colldata;
 
     private BoxCollider2D _collider;
-    protected float skinWidth = 0.1f;
+    protected float skinWidth = 0.015f;
     protected float vraySpacing, hraySpacing;
 
     public virtual void Start()
@@ -59,10 +60,16 @@ public abstract class RaycastController : MonoBehaviour
         public bool right, left;
         public int direction;
 
+        public bool climbingSlope;
+        public float slopeAngle, slopeAngleOld;
         public void reset()
         {
             right = left = false;
             below = above = false;
+            climbingSlope = false;
+
+            slopeAngleOld = slopeAngle;
+            slopeAngle = 0f;
         }
     }
 

@@ -2,10 +2,14 @@
 // this player controller has been followed by video made by sabastian lague.//
 
 using UnityEngine;
+using UnityEngine.InputSystem.iOS;
 
 public class Controller2D : RaycastController {
 
     [SerializeField] LayerMask _layermask;
+
+    private float _maxClimbAngle = 80f;
+
 
     public override void Start() {
         base.Start();    
@@ -23,12 +27,9 @@ public class Controller2D : RaycastController {
 
         HorizontalCollision(ref velocity);
         VerticalCollision(ref velocity);
-        if (velocity.y !< 0.1) {
-        }
 
         // [] Flip
-        transform.rotation = (_colldata.direction == -1) ?
-            Quaternion.Euler(transform.rotation.x, 180f, transform.rotation.z) : Quaternion.Euler(transform.rotation.x, 0f, transform.rotation.z);
+        transform.rotation = Quaternion.Euler(0f, _colldata.direction == -1 ? 180f : 0f, 0f);
 
         transform.Translate(velocity, Space.World);
     }
@@ -51,6 +52,7 @@ public class Controller2D : RaycastController {
                 velocity.y = (hit.distance - skinWidth) * directionY;
                 raylength = hit.distance;
 
+
                 _colldata.above = directionY == 1;
                 _colldata.below = directionY == -1;
             }
@@ -64,7 +66,7 @@ public class Controller2D : RaycastController {
         float directionX = _colldata.direction;
         float raylength = Mathf.Abs(velocity.x) + skinWidth;
 
-        if (velocity.x < skinWidth)
+        if (Mathf.Abs(velocity.x) < skinWidth)
         {
             raylength = 2 * skinWidth;
         }
@@ -79,17 +81,55 @@ public class Controller2D : RaycastController {
 
             if (hit)
             {
-                velocity.x = (hit.distance - skinWidth) * directionX;
-                raylength = hit.distance;
+                var slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
 
+                print(slopeAngle);
+                if (i == 0 && slopeAngle <= _maxClimbAngle)
+                {
+                    float distanceToSlopeStart = 0f;
+                    if(slopeAngle != _colldata.slopeAngleOld)
+                    {
+                        distanceToSlopeStart = hit.distance - skinWidth;
+                        velocity.x -= distanceToSlopeStart * directionX;
+                    }
+                    ClimbSlope(ref velocity, slopeAngle);
+                    velocity.x += distanceToSlopeStart * directionX;
+                }
 
-                _colldata.right = directionX == 1;
-                _colldata.left = directionX == -1;
+                if (!_colldata.climbingSlope || slopeAngle > _maxClimbAngle)
+                {
+                    velocity.x = (hit.distance - skinWidth) * directionX;
+                    raylength = hit.distance;
+
+                    if (_colldata.climbingSlope)
+                    {
+                        velocity.y = Mathf.Tan(_colldata.slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x);
+                    }
+
+                    _colldata.right = directionX == 1;
+                    _colldata.left = directionX == -1;
+                }
             }
 
             Debug.DrawRay(rayo, Vector2.right * directionX * raylength, Color.blue);
         }
 
     }
+
+    void ClimbSlope(ref Vector3 velocity, float angle)
+    {
+        var _moveDistance = Mathf.Abs(velocity.x);
+        var _climbVelocityY = Mathf.Sin(angle * Mathf.Deg2Rad) * _moveDistance;
+
+        if (velocity.y <= _climbVelocityY) {
+            velocity.y = _climbVelocityY;
+            velocity.x = Mathf.Cos(angle * Mathf.Deg2Rad) * _moveDistance * _colldata.direction;
+            _colldata.below = true;
+            _colldata.climbingSlope = true;
+
+            _colldata.slopeAngle = angle;
+        }
+    }
 }
+
 
