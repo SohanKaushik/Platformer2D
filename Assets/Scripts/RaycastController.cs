@@ -60,13 +60,14 @@ public abstract class RaycastController : MonoBehaviour
         public bool right, left;
         public int direction;
 
-        public bool climbingSlope;
+        public bool climbingSlope, descendSlope;
         public float slopeAngle, slopeAngleOld;
         public void reset()
         {
             right = left = false;
             below = above = false;
             climbingSlope = false;
+            descendSlope = false;
 
             slopeAngleOld = slopeAngle;
             slopeAngle = 0f;

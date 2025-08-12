@@ -2,7 +2,6 @@
 // this player controller has been followed by video made by sabastian lague.//
 
 using UnityEngine;
-using UnityEngine.InputSystem.iOS;
 
 public class Controller2D : RaycastController {
 
@@ -20,6 +19,9 @@ public class Controller2D : RaycastController {
         UpdateRayOrigins();
         _colldata.reset();
 
+        if(velocity.y < 0) { 
+            DescendSlope(ref velocity);
+        }
 
         if(velocity.x != 0) {
             _colldata.direction = (int)Mathf.Sign(velocity.x);
@@ -53,6 +55,11 @@ public class Controller2D : RaycastController {
                 raylength = hit.distance;
 
 
+                if (_colldata.climbingSlope)
+                {
+                    velocity.x = velocity.y / Mathf.Tan(_colldata.slopeAngle * Mathf.Deg2Rad) * Mathf.Sign(velocity.x);
+                }
+
                 _colldata.above = directionY == 1;
                 _colldata.below = directionY == -1;
             }
@@ -83,7 +90,6 @@ public class Controller2D : RaycastController {
             {
                 var slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
 
-                print(slopeAngle);
                 if (i == 0 && slopeAngle <= _maxClimbAngle)
                 {
                     float distanceToSlopeStart = 0f;
@@ -92,7 +98,7 @@ public class Controller2D : RaycastController {
                         distanceToSlopeStart = hit.distance - skinWidth;
                         velocity.x -= distanceToSlopeStart * directionX;
                     }
-                    ClimbSlope(ref velocity, slopeAngle);
+                    AscendSlope(ref velocity, slopeAngle);
                     velocity.x += distanceToSlopeStart * directionX;
                 }
 
@@ -101,6 +107,7 @@ public class Controller2D : RaycastController {
                     velocity.x = (hit.distance - skinWidth) * directionX;
                     raylength = hit.distance;
 
+                    // slopeAngle > _maxClimbAngle : hits a wall or something restrict y movemnet
                     if (_colldata.climbingSlope)
                     {
                         velocity.y = Mathf.Tan(_colldata.slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x);
@@ -116,7 +123,7 @@ public class Controller2D : RaycastController {
 
     }
 
-    void ClimbSlope(ref Vector3 velocity, float angle)
+    void AscendSlope(ref Vector3 velocity, float angle)
     {
         var _moveDistance = Mathf.Abs(velocity.x);
         var _climbVelocityY = Mathf.Sin(angle * Mathf.Deg2Rad) * _moveDistance;
@@ -124,10 +131,37 @@ public class Controller2D : RaycastController {
         if (velocity.y <= _climbVelocityY) {
             velocity.y = _climbVelocityY;
             velocity.x = Mathf.Cos(angle * Mathf.Deg2Rad) * _moveDistance * _colldata.direction;
+
             _colldata.below = true;
             _colldata.climbingSlope = true;
-
             _colldata.slopeAngle = angle;
+        }
+    }
+    void DescendSlope(ref Vector3 velocity)
+    {
+        Vector2 rayOrigin = (_colldata.direction == 1) ? _origins.bottomLeft : _origins.bottomRight;
+        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, Mathf.Infinity, _layermask);
+
+        if (hit)
+        {
+            float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+
+            if (slopeAngle == 0 && slopeAngle > _maxClimbAngle) return;
+
+            if (Mathf.Sign(hit.normal.x) == Mathf.Sign(_colldata.direction))
+            {
+                if (hit.distance - skinWidth <= Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x)) {
+                    var _moveDistance = Mathf.Abs(velocity.x);
+                    var _descentVelocityY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * _moveDistance;
+
+                    velocity.y -= _descentVelocityY;
+                    velocity.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * _moveDistance * _colldata.direction;
+
+                    _colldata.slopeAngle = slopeAngle;
+                    _colldata.descendSlope = true;
+                    _colldata.below = true;
+                }
+            }
         }
     }
 }

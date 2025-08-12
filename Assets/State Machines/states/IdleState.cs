@@ -1,5 +1,4 @@
 using UnityEngine;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class IdleState : PlayerState {
 
@@ -10,7 +9,7 @@ public class IdleState : PlayerState {
     public override void OnEnter() {
 
         player._velocity.x = 0.0f;
-        player._velocity.y = -0.000000000001f; // applying minimal downward force 
+        player._velocity.y = -0.001f; // applying minimal downward force 
         player._smooothfactorx = 0.0f;
 
         player._wallClimbTimeout = false;

@@ -1,7 +1,4 @@
-using Unity.Android.Gradle.Manifest;
 using UnityEngine;
-using UnityEngine.Assertions.Must;
-using UnityEngine.Rendering;
 
 [RequireComponent(typeof(Controller2D), typeof(PlayerInputSystem))]
 public class Player : MonoBehaviour
