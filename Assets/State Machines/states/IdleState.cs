@@ -9,11 +9,10 @@ public class IdleState : PlayerState {
     public override void OnEnter() {
 
         player._velocity.x = 0.0f;
-        player._velocity.y = -0.001f; // applying minimal downward force 
         player._smooothfactorx = 0.0f;
 
         player._wallClimbTimeout = false;
-        player.GetComponent<SpriteRenderer>().color = Color.white;  
+        player.GetComponent<SpriteRenderer>().color = Color.white;
     }
 
 

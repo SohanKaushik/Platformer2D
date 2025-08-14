@@ -1,3 +1,4 @@
+using UnityEditor.TerrainTools;
 using UnityEngine;
 
 [RequireComponent(typeof(Controller2D), typeof(PlayerInputSystem))]
@@ -15,7 +16,7 @@ public class Player : MonoBehaviour
     [SerializeField] float jumpBufferTime;
     [SerializeField] private float _jumpHeight;
     [SerializeField] private float _terminalVelocity;
-    
+
     [SerializeField] float _accelerationTimeAirborne;
 
     [Header("Dash")]
@@ -29,11 +30,11 @@ public class Player : MonoBehaviour
     public FallState _fall_state;
     public DashState _dash_state;
     public WallClimbState _wall_climb_state;
-    
+
     [HideInInspector] public Vector3 _velocity;
     [HideInInspector] public float _gravity = -1.0f;
 
-    public struct PublicContext { 
+    public struct PublicContext {
         public bool dashRequest;
         public bool wallClimbHoldRequest;
     } public PublicContext _context;
@@ -85,7 +86,6 @@ public class Player : MonoBehaviour
     private void Update()
     {
         _stateMachine._currentState.Update();
-
         if (!isGrounded() ) {
             if (_controller._colldata.above) _velocity.y = 0.01f;
             if(_stateMachine._currentState != _fall_state && !IsWallClimbAllowed())
@@ -108,7 +108,7 @@ public class Player : MonoBehaviour
     void FixedUpdate() 
     {
         _stateMachine._currentState.FixedUpdate();
-        _controller.move(_velocity * Time.deltaTime);
+        _controller.move(_velocity * Time.fixedDeltaTime);
     }
 
     public Vector2 GetAxisDirections()

@@ -66,6 +66,8 @@ public abstract class RaycastController : MonoBehaviour
         {
             right = left = false;
             below = above = false;
+
+            above = false;
             climbingSlope = false;
             descendSlope = false;
 

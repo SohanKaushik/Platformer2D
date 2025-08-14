@@ -23,7 +23,7 @@ public class UIManager : MonoBehaviour
         _deathUI.SetActive(false);
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         _below.SetText("isGrounded : " + _player.isGrounded());
         _velocity.SetText("Velocity : " + _player._velocity.ToString());

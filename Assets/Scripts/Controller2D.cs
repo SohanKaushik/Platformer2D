@@ -1,17 +1,20 @@
 // summary//
 // this player controller has been followed by video made by sabastian lague.//
 
+using Mono.Cecil.Cil;
 using UnityEngine;
 
-public class Controller2D : RaycastController {
+public class Controller2D : RaycastController
+{
 
     [SerializeField] LayerMask _layermask;
 
     private float _maxClimbAngle = 80f;
 
 
-    public override void Start() {
-        base.Start();    
+    public override void Start()
+    {
+        base.Start();
     }
 
     public void move(Vector3 velocity)
@@ -19,11 +22,13 @@ public class Controller2D : RaycastController {
         UpdateRayOrigins();
         _colldata.reset();
 
-        if(velocity.y < 0) { 
+        if (velocity.y < 0)
+        {
             DescendSlope(ref velocity);
         }
 
-        if(velocity.x != 0) {
+        if (velocity.x != 0)
+        {
             _colldata.direction = (int)Mathf.Sign(velocity.x);
         }
 
@@ -41,6 +46,7 @@ public class Controller2D : RaycastController {
         float directionY = Mathf.Sign(velocity.y);
         float raylength = Mathf.Abs(velocity.y) + skinWidth;
 
+        if (velocity.y == 0) directionY = -1f;
         for (int i = 0; i < vraycount; i++)
         {
             Vector2 rayo = (directionY == -1) ? _origins.bottomLeft : _origins.topLeft;
@@ -93,7 +99,7 @@ public class Controller2D : RaycastController {
                 if (i == 0 && slopeAngle <= _maxClimbAngle)
                 {
                     float distanceToSlopeStart = 0f;
-                    if(slopeAngle != _colldata.slopeAngleOld)
+                    if (slopeAngle != _colldata.slopeAngleOld)
                     {
                         distanceToSlopeStart = hit.distance - skinWidth;
                         velocity.x -= distanceToSlopeStart * directionX;
@@ -128,7 +134,8 @@ public class Controller2D : RaycastController {
         var _moveDistance = Mathf.Abs(velocity.x);
         var _climbVelocityY = Mathf.Sin(angle * Mathf.Deg2Rad) * _moveDistance;
 
-        if (velocity.y <= _climbVelocityY) {
+        if (velocity.y <= _climbVelocityY)
+        {
             velocity.y = _climbVelocityY;
             velocity.x = Mathf.Cos(angle * Mathf.Deg2Rad) * _moveDistance * _colldata.direction;
 
@@ -142,28 +149,28 @@ public class Controller2D : RaycastController {
         Vector2 rayOrigin = (_colldata.direction == 1) ? _origins.bottomLeft : _origins.bottomRight;
         RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, Mathf.Infinity, _layermask);
 
-        if (hit)
-        {
-            float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+        //if (hit)
+        //{
+        //    float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
 
-            if (slopeAngle == 0 && slopeAngle > _maxClimbAngle) return;
+        //    if (slopeAngle == 0 && slopeAngle > _maxClimbAngle) return;
 
-            if (Mathf.Sign(hit.normal.x) == Mathf.Sign(_colldata.direction))
-            {
-                if (hit.distance - skinWidth <= Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x)) {
-                    var _moveDistance = Mathf.Abs(velocity.x);
-                    var _descentVelocityY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * _moveDistance;
+        //    if (Mathf.Sign(hit.normal.x) == Mathf.Sign(_colldata.direction))
+        //    {
+        //        if (hit.distance - skinWidth <= Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x))
+        //        {
+        //            var _moveDistance = Mathf.Abs(velocity.x);
+        //            var _descentVelocityY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * _moveDistance;
 
-                    velocity.y -= _descentVelocityY;
-                    velocity.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * _moveDistance * _colldata.direction;
+        //            velocity.y -= _descentVelocityY;
+        //            velocity.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * _moveDistance * _colldata.direction;
 
-                    _colldata.slopeAngle = slopeAngle;
-                    _colldata.descendSlope = true;
-                    _colldata.below = true;
-                }
-            }
-        }
+        //            _colldata.slopeAngle = slopeAngle;
+        //            _colldata.descendSlope = true;
+        //            _colldata.below = true;
+        //        }
+        //    }
+        //}
     }
 }
-
 

@@ -75,6 +75,6 @@ public class FallState : PlayerState
     public override void OnExit()
     {
         // # prevents accumulated y velocity to any other state
-        player._velocity.y = -0.001f;
+        player._velocity.y = 0.0f;
     }
 }
