@@ -8,11 +8,10 @@ public class IdleState : PlayerState {
 
     public override void OnEnter() {
 
-        player._velocity.x = 0.0f;
+        player._velocity = Vector3.zero;
         player._smooothfactorx = 0.0f;
 
         player._wallClimbTimeout = false;
-        player.GetComponent<SpriteRenderer>().color = Color.white;
     }
 
 

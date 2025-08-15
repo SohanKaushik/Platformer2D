@@ -86,6 +86,7 @@ public class Player : MonoBehaviour
     private void Update()
     {
         _stateMachine._currentState.Update();
+
         if (!isGrounded() ) {
             if (_controller._colldata.above) _velocity.y = 0.01f;
             if(_stateMachine._currentState != _fall_state && !IsWallClimbAllowed())
@@ -103,6 +104,8 @@ public class Player : MonoBehaviour
         jumpBufferCounter = (PlayerInputManager().OnJumpTapped()) ? jumpBufferTime : jumpBufferCounter -= Time.deltaTime;
 
         wallClimbTimer = (IsWallClimbing()) ? wallClimbTimer -= Time.deltaTime : wallClimbTimer = wallClimbDuration;
+
+        Debug.Log(IsWallClimbAllowed());
     }
 
     void FixedUpdate() 

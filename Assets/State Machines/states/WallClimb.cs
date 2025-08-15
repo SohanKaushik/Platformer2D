@@ -34,7 +34,7 @@ public class WallClimbState : PlayerState
         }
 
 
-        if(player.wallClimbTimer < 0) { 
+        if(player.wallClimbTimer < 0 || !player.IsWallClimbAllowed()) { 
             player._wallClimbTimeout = true;
 
             player.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
@@ -74,7 +74,7 @@ public class WallClimbState : PlayerState
         if (col == null) return false;
 
         float distance = 0.08f;
-        float offset = 1f;
+        float offset = 0f;
         Vector2 direction = new Vector2(player.GetDireciton(), 0);
         int layerMask = LayerMask.GetMask("Obstacles");
 

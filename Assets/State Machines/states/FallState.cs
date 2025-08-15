@@ -76,5 +76,6 @@ public class FallState : PlayerState
     {
         // # prevents accumulated y velocity to any other state
         player._velocity.y = 0.0f;
+        player.GetComponent<SpriteRenderer>().color = Color.white;
     }
 }
