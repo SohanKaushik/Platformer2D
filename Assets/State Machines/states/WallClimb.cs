@@ -33,8 +33,12 @@ public class WallClimbState : PlayerState
             _wallJumped = true;
         }
 
+        if (!player.IsWallClimbAllowed()) {
+            stateMachine.ChangeStateTo(player._fall_state);
+            return;
+        }
 
-        if(player.wallClimbTimer < 0 || !player.IsWallClimbAllowed()) { 
+        if(player.wallClimbTimer < 0 ) { 
             player._wallClimbTimeout = true;
 
             player.gameObject.GetComponent<SpriteRenderer>().color = Color.red;

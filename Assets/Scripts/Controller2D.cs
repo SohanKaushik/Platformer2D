@@ -1,7 +1,7 @@
-// summary//
-// this player controller has been followed by video made by sabastian lague.//
+// summary //
+// this player controller has been followed by video made by sabastian lague.
+//
 
-using Mono.Cecil.Cil;
 using UnityEngine;
 
 public class Controller2D : RaycastController
@@ -22,19 +22,17 @@ public class Controller2D : RaycastController
         UpdateRayOrigins();
         _colldata.reset();
 
-        if (velocity.y < 0)
-        {
-            DescendSlope(ref velocity);
+        if (velocity.x != 0) {
+            _colldata.direction = (int)Mathf.Sign(velocity.x);
         }
 
-        if (velocity.x != 0)
-        {
-            _colldata.direction = (int)Mathf.Sign(velocity.x);
+        if (velocity.y <= 0 || !_colldata.below) {
+            DescendSlope(ref velocity);
         }
 
         HorizontalCollision(ref velocity);
         VerticalCollision(ref velocity);
-
+        Debug.Log(_colldata.direction);
         // [] Flip
         transform.rotation = Quaternion.Euler(0f, _colldata.direction == -1 ? 180f : 0f, 0f);
 
@@ -61,7 +59,7 @@ public class Controller2D : RaycastController
                 raylength = hit.distance;
 
 
-                if (_colldata.climbingSlope)
+                if (_colldata.ascendingSlope)
                 {
                     velocity.x = velocity.y / Mathf.Tan(_colldata.slopeAngle * Mathf.Deg2Rad) * Mathf.Sign(velocity.x);
                 }
@@ -92,36 +90,35 @@ public class Controller2D : RaycastController
             RaycastHit2D hit = Physics2D.Raycast(rayo, Vector2.right * directionX, raylength, _layermask);
 
 
-            if (hit)
+            if (!hit) continue;
+
+            var slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+
+            if (i == 0 && slopeAngle <= _maxClimbAngle)
             {
-                var slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
-
-                if (i == 0 && slopeAngle <= _maxClimbAngle)
+                float distanceToSlopeStart = 0f;
+                if (slopeAngle != _colldata.slopeAngleOld)
                 {
-                    float distanceToSlopeStart = 0f;
-                    if (slopeAngle != _colldata.slopeAngleOld)
-                    {
-                        distanceToSlopeStart = hit.distance - skinWidth;
-                        velocity.x -= distanceToSlopeStart * directionX;
-                    }
-                    AscendSlope(ref velocity, slopeAngle);
-                    velocity.x += distanceToSlopeStart * directionX;
+                    distanceToSlopeStart = hit.distance - skinWidth;
+                    velocity.x -= distanceToSlopeStart * directionX;
+                }
+                AscendSlope(ref velocity, slopeAngle);
+                velocity.x += distanceToSlopeStart * directionX;
+            }
+
+            if (!_colldata.ascendingSlope || slopeAngle > _maxClimbAngle)
+            {
+                velocity.x = (hit.distance - skinWidth) * directionX;
+                raylength = hit.distance;
+
+                // slopeAngle > _maxClimbAngle : hits a wall or something restrict y movemnet
+                if (_colldata.ascendingSlope)
+                {
+                    velocity.y = Mathf.Tan(_colldata.slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x);
                 }
 
-                if (!_colldata.climbingSlope || slopeAngle > _maxClimbAngle)
-                {
-                    velocity.x = (hit.distance - skinWidth) * directionX;
-                    raylength = hit.distance;
-
-                    // slopeAngle > _maxClimbAngle : hits a wall or something restrict y movemnet
-                    if (_colldata.climbingSlope)
-                    {
-                        velocity.y = Mathf.Tan(_colldata.slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x);
-                    }
-
-                    _colldata.right = directionX == 1;
-                    _colldata.left = directionX == -1;
-                }
+                _colldata.right = directionX == 1;
+                _colldata.left = directionX == -1;
             }
 
             Debug.DrawRay(rayo, Vector2.right * directionX * raylength, Color.blue);
@@ -140,37 +137,40 @@ public class Controller2D : RaycastController
             velocity.x = Mathf.Cos(angle * Mathf.Deg2Rad) * _moveDistance * _colldata.direction;
 
             _colldata.below = true;
-            _colldata.climbingSlope = true;
+            _colldata.ascendingSlope = true;
             _colldata.slopeAngle = angle;
         }
     }
     void DescendSlope(ref Vector3 velocity)
     {
-        Vector2 rayOrigin = (_colldata.direction == 1) ? _origins.bottomLeft : _origins.bottomRight;
-        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, Mathf.Infinity, _layermask);
+        Vector2 origin = (_colldata.direction == -1) ? _origins.bottomRight : _origins.bottomLeft;
+        RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.down, Mathf.Infinity, _layermask);
+        if (!hit) return;
 
-        //if (hit)
-        //{
-        //    float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+        float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+        if (slopeAngle == 0 || slopeAngle > _maxClimbAngle) return;
+        if (Mathf.Sign(hit.normal.x) == Mathf.Sign(_colldata.direction)) {
 
-        //    if (slopeAngle == 0 && slopeAngle > _maxClimbAngle) return;
+           // hit distance < perpendicular distance
+           if((hit.distance - skinWidth) <= (Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x))) {
 
-        //    if (Mathf.Sign(hit.normal.x) == Mathf.Sign(_colldata.direction))
-        //    {
-        //        if (hit.distance - skinWidth <= Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x))
-        //        {
-        //            var _moveDistance = Mathf.Abs(velocity.x);
-        //            var _descentVelocityY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * _moveDistance;
+                // constant speed throughout the slope
+                var _speed = Mathf.Abs(velocity.x);
 
-        //            velocity.y -= _descentVelocityY;
-        //            velocity.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * _moveDistance * _colldata.direction;
+                velocity.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * _speed * _colldata.direction;
+                velocity.y -= Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * _speed;
 
-        //            _colldata.slopeAngle = slopeAngle;
-        //            _colldata.descendSlope = true;
-        //            _colldata.below = true;
-        //        }
-        //    }
-        //}
+                Debug.Log("hehe");
+                _colldata.below = true;
+                _colldata.slopeAngle = slopeAngle;
+                _colldata.descendingSlope = true;
+           }
+        }
+    }
+
+
+    private bool isSlopeCaptured()
+    {
+       return (_colldata.ascendingSlope || _colldata.descendingSlope);
     }
 }
-

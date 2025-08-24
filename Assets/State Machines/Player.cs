@@ -104,8 +104,6 @@ public class Player : MonoBehaviour
         jumpBufferCounter = (PlayerInputManager().OnJumpTapped()) ? jumpBufferTime : jumpBufferCounter -= Time.deltaTime;
 
         wallClimbTimer = (IsWallClimbing()) ? wallClimbTimer -= Time.deltaTime : wallClimbTimer = wallClimbDuration;
-
-        Debug.Log(IsWallClimbAllowed());
     }
 
     void FixedUpdate() 
@@ -127,7 +125,7 @@ public class Player : MonoBehaviour
         return (_controller._colldata.right || _controller._colldata.left)
          && !_wallClimbTimeout
          && PlayerInputManager().IsWallClimbHeld()
-         && !_controller._colldata.climbingSlope;
+         && !_controller._colldata.ascendingSlope;
     }
 
     public bool IsWallClimbing(){
