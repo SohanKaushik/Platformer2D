@@ -8,7 +8,7 @@ public class Controller2D : RaycastController
 {
 
     [SerializeField] LayerMask _layermask;
-
+    public bool _isGrounded;
     private float _maxClimbAngle = 80f;
 
 
@@ -32,10 +32,12 @@ public class Controller2D : RaycastController
 
         HorizontalCollision(ref velocity);
         VerticalCollision(ref velocity);
-        Debug.Log(_colldata.direction);
+
         // [] Flip
         transform.rotation = Quaternion.Euler(0f, _colldata.direction == -1 ? 180f : 0f, 0f);
 
+        if(isSlopeCaptured()) _colldata.below = true;
+        _isGrounded = _colldata.below;
         transform.Translate(velocity, Space.World);
     }
 
@@ -136,7 +138,6 @@ public class Controller2D : RaycastController
             velocity.y = _climbVelocityY;
             velocity.x = Mathf.Cos(angle * Mathf.Deg2Rad) * _moveDistance * _colldata.direction;
 
-            _colldata.below = true;
             _colldata.ascendingSlope = true;
             _colldata.slopeAngle = angle;
         }
@@ -152,7 +153,7 @@ public class Controller2D : RaycastController
         if (Mathf.Sign(hit.normal.x) == Mathf.Sign(_colldata.direction)) {
 
            // hit distance < perpendicular distance
-           if((hit.distance - skinWidth) <= (Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x))) {
+           if(hit.distance - skinWidth <= Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x)) {
 
                 // constant speed throughout the slope
                 var _speed = Mathf.Abs(velocity.x);
@@ -160,16 +161,14 @@ public class Controller2D : RaycastController
                 velocity.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * _speed * _colldata.direction;
                 velocity.y -= Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * _speed;
 
-                Debug.Log("hehe");
-                _colldata.below = true;
                 _colldata.slopeAngle = slopeAngle;
                 _colldata.descendingSlope = true;
-           }
+           }    
         }
     }
 
 
-    private bool isSlopeCaptured()
+    public bool isSlopeCaptured()
     {
        return (_colldata.ascendingSlope || _colldata.descendingSlope);
     }

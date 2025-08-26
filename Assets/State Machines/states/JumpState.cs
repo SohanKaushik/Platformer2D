@@ -18,6 +18,7 @@ public class JumpState : PlayerState
     public override void OnEnter()
     {
         player._velocity.y = _maxJumpVelocity;
+        player._isDashing = false;
     }
 
     public override void Update()

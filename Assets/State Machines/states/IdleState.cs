@@ -10,7 +10,8 @@ public class IdleState : PlayerState {
 
         player._velocity = Vector3.zero;
         player._smooothfactorx = 0.0f;
-
+        
+        player._isDashing = false;
         player._wallClimbTimeout = false;
     }
 
@@ -26,6 +27,12 @@ public class IdleState : PlayerState {
         // # jump 
         if (player.jumpBufferCounter > 0.0f) {
             stateMachine.ChangeStateTo(player._jump_state);
+            return;
+        }
+
+        // # dash
+        if (player.PlayerInputManager().OnDashTapped() && player.IsDashAllowed()) {
+            stateMachine.ChangeStateTo(player._dash_state);
             return;
         }
 

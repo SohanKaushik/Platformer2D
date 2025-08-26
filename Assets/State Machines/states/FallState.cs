@@ -45,6 +45,12 @@ public class FallState : PlayerState
             return;
         }
 
+        // # dash
+        if (player.PlayerInputManager().OnDashTapped() && player.IsDashAllowed()) {
+            stateMachine.ChangeStateTo(player._dash_state);
+            return;
+        }
+
         // # wall jumping
         if (player.IsWallClimbAllowed())  {
             stateMachine.ChangeStateTo(player._wall_climb_state);

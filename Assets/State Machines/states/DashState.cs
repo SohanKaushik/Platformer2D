@@ -1,12 +1,14 @@
 using System.Collections;
+using Unity.Cinemachine;
 using UnityEngine;
 
 public class DashState : PlayerState
 {
+    private bool _dashCompleted;
     private float _dashDuration;
     private float _dashSpeed;
+    private CinemachineImpulseSource _impulseSource;
 
-    private bool _isDashing;
     private Vector2 _dashDirection;
 
     public DashState(Player player, PlayerStateMachine state, float dashSpeed, float dashDuration)
@@ -18,13 +20,14 @@ public class DashState : PlayerState
 
     public override void OnEnter()
     {
-        if (_isDashing) return;
+        _impulseSource = player.GetComponent<CinemachineImpulseSource>();
         player.StartCoroutine(DashCoroutine());
+        _dashCompleted = false;
     }
 
     public override void FixedUpdate()
     {
-        if (_isDashing)
+        if (player._isDashing)
         {
             player._velocity = _dashDirection * _dashSpeed;
         }
@@ -32,7 +35,8 @@ public class DashState : PlayerState
 
     private IEnumerator DashCoroutine()
     {
-        _isDashing = true;
+        player._isDashing = true;
+        _impulseSource.GenerateImpulse(player.GetAxisDirections());
 
         Vector2 inputDir = player.GetAxisDirections();
         _dashDirection = inputDir.magnitude > 0.1f
@@ -41,8 +45,6 @@ public class DashState : PlayerState
 
 
         yield return new WaitForSeconds(_dashDuration);
-
-        _isDashing = false;
 
         stateMachine.ChangeStateTo(player._fall_state);
     }

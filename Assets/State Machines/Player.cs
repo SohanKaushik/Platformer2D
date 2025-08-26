@@ -1,4 +1,3 @@
-using UnityEditor.TerrainTools;
 using UnityEngine;
 
 [RequireComponent(typeof(Controller2D), typeof(PlayerInputSystem))]
@@ -44,6 +43,8 @@ public class Player : MonoBehaviour
 
     [HideInInspector] public float jumpBufferCounter;
 
+    [HideInInspector] public bool _isDashing;
+
     [HideInInspector] public bool _wallClimbTimeout;
     [HideInInspector] public float wallClimbTimer;
 
@@ -86,10 +87,11 @@ public class Player : MonoBehaviour
     private void Update()
     {
         _stateMachine._currentState.Update();
+        Debug.Log(_isDashing);
 
         if (!isGrounded() ) {
             if (_controller._colldata.above) _velocity.y = 0.01f;
-            if(_stateMachine._currentState != _fall_state && !IsWallClimbAllowed())
+            if(_stateMachine._currentState != _fall_state && !IsWallClimbAllowed() && !_isDashing)
             _stateMachine.ChangeStateTo(_fall_state);
         }
 
@@ -119,13 +121,18 @@ public class Player : MonoBehaviour
 
     public PlayerInputSystem PlayerInputManager() => _inputhandler;
     public int GetDireciton() => _controller._colldata.direction;
-    public bool isGrounded() => _controller._colldata.below;
+    public bool isGrounded() => _controller._isGrounded;
 
     public bool IsWallClimbAllowed() {
         return (_controller._colldata.right || _controller._colldata.left)
          && !_wallClimbTimeout
-         && PlayerInputManager().IsWallClimbHeld()
-         && !_controller._colldata.ascendingSlope;
+         && !_controller._colldata.ascendingSlope
+         && PlayerInputManager().IsWallClimbHeld();
+    }
+
+    public bool IsDashAllowed() {
+        return !_isDashing
+            && !(_stateMachine._currentState == _dash_state);
     }
 
     public bool IsWallClimbing(){
