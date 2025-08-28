@@ -17,6 +17,7 @@ public class RunState : PlayerState
     public override void OnEnter()
     {
         // .. _animator.SetBool("run", true);
+        player._isDashing = false;
     }
 
     public override void Update()

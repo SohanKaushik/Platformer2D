@@ -33,7 +33,7 @@ public class FallState : PlayerState
             if (Mathf.Abs(player.GetAxisDirections().x) > 0.1f) {
                 stateMachine.ChangeStateTo(player._run_state);
             }
-            else{
+            else {
                 stateMachine.ChangeStateTo(player._idle_state);
             }
             return;
@@ -46,7 +46,7 @@ public class FallState : PlayerState
         }
 
         // # dash
-        if (player.PlayerInputManager().OnDashTapped() && player.IsDashAllowed()) {
+        if (player.PlayerInputManager().OnDashTapped() && (player.IsDashAllowed() || player.jumpBufferCounter >= 0.0f)) {
             stateMachine.ChangeStateTo(player._dash_state);
             return;
         }

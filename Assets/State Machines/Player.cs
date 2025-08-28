@@ -87,8 +87,6 @@ public class Player : MonoBehaviour
     private void Update()
     {
         _stateMachine._currentState.Update();
-        Debug.Log(_isDashing);
-
         if (!isGrounded() ) {
             if (_controller._colldata.above) _velocity.y = 0.01f;
             if(_stateMachine._currentState != _fall_state && !IsWallClimbAllowed() && !_isDashing)
@@ -132,11 +130,16 @@ public class Player : MonoBehaviour
 
     public bool IsDashAllowed() {
         return !_isDashing
-            && !(_stateMachine._currentState == _dash_state);
+            && !(_stateMachine._currentState == _dash_state)
+            && PlayerInputManager().OnDashTapped();
     }
 
     public bool IsWallClimbing(){
         return (_stateMachine._currentState == _wall_climb_state) ? true : false;
+    }
+
+    public bool IsCollided() {
+        return (_controller._colldata.right || _controller._colldata.left);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

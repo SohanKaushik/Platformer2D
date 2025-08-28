@@ -18,20 +18,20 @@ public class IdleState : PlayerState {
 
     public override void Update()
     {
-        // # dash
-        if (player._context.dashRequest) {
-            stateMachine.ChangeStateTo(player._dash_state);
-            return;
-        }
+        //// # dash
+        //if (player._context.dashRequest) {
+        //    stateMachine.ChangeStateTo(player._dash_state);
+        //    return;
+        //}
 
-        // # jump 
+        // # jump && dash
         if (player.jumpBufferCounter > 0.0f) {
             stateMachine.ChangeStateTo(player._jump_state);
             return;
         }
 
         // # dash
-        if (player.PlayerInputManager().OnDashTapped() && player.IsDashAllowed()) {
+        if (player.IsDashAllowed() || player.jumpBufferCounter >= 0.0f) {
             stateMachine.ChangeStateTo(player._dash_state);
             return;
         }

@@ -2699,7 +2699,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1480422456467982231, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: _dashSpeed
-      value: 50
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 1480422456467982231, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: _footSpeed
@@ -2872,7 +2872,7 @@ Transform:
   m_GameObject: {fileID: 1850980446}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -27.0208, y: 6.0294, z: 0}
+  m_LocalPosition: {x: -27.0208, y: 5.46, z: 0}
   m_LocalScale: {x: 19.397453, y: 11.068982, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
