@@ -7,6 +7,8 @@ public class FallState : PlayerState
     private float _gravityModifier = 1.5f;
     private float _accelerationTimeAirborne = 0.05f;
 
+    private float _wallInteractSpeed = 10.0f;
+
     public FallState(Player player, PlayerStateMachine state, float terminalMultiplier, float accelerationTimeAirborne)
         : base(player, state, PlayerStateList.Falling)
     {
@@ -16,12 +18,11 @@ public class FallState : PlayerState
 
     public override void Update()
     {
-
-        // # dash
-        if (player._context.dashRequest) {
-            stateMachine.ChangeStateTo(player._dash_state);
-            return;
-        }
+        //// # dash
+        //if (player._context.dashRequest) {
+        //    stateMachine.ChangeStateTo(player._dash_state);
+        //    return;
+        //}
 
         if (player.PlayerInputManager().OnJumpReleased() && player._velocity.y > 0f) {
             _jumpCut = true;
@@ -60,6 +61,8 @@ public class FallState : PlayerState
 
     public override void FixedUpdate()
     {
+        var fallForce = 0f;
+
         // # it has a depecdency to the jump Height and duration
         var targetvelocity = player.GetAxisDirections().x * player._footSpeed;
         player._velocity.x = Mathf.SmoothDamp(player._velocity.x, targetvelocity, ref player._smooothfactorx, _accelerationTimeAirborne);
@@ -71,11 +74,20 @@ public class FallState : PlayerState
         }
 
         // # [0-peak] -> modified gravity :: [peak-ground] -> applied normal gravity
-        var fallSpeed = (player._velocity.y < 0.0f) ? player._velocity.y + player._gravity * Time.fixedDeltaTime * _gravityModifier :
-                         player._velocity.y + player._gravity * Time.fixedDeltaTime;
+        if(player._velocity.y < 0.0f){
+            fallForce = player._velocity.y + player._gravity * Time.fixedDeltaTime * _gravityModifier;
+
+
+            if (player.IsCollided() && !player.isGrounded() && Mathf.Abs(player.GetAxisDirections().x) > 0.1f) {
+                fallForce = -_wallInteractSpeed;
+            }
+        }
+        else {
+            fallForce = player._velocity.y + player._gravity * Time.fixedDeltaTime;
+        }
 
         // # terminal velocity
-        player._velocity.y = Mathf.Max(fallSpeed, -_terminalMultiplier);
+        player._velocity.y = Mathf.Max(fallForce, -_terminalMultiplier);
     }
 
     public override void OnExit()
