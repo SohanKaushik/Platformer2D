@@ -4,7 +4,7 @@ public class FallState : PlayerState
 {
     private bool _jumpCut;
     private float _terminalMultiplier;
-    private float _gravityModifier = 1.5f;
+    private float _gravityModifier = 1.8f;
     private float _accelerationTimeAirborne = 0.05f;
 
     private float _wallInteractSpeed = 10.0f;
@@ -63,8 +63,10 @@ public class FallState : PlayerState
     {
         var fallForce = 0f;
 
-        // # it has a depecdency to the jump Height and duration
-        var targetvelocity = player.GetAxisDirections().x * player._footSpeed;
+        float desired = player.GetAxisDirections().x * player._footSpeed;
+        float airControlFactor = 0.66f; // tune between 0 (no control) and 1 (full control)
+
+        var targetvelocity = Mathf.Lerp(player._velocity.x, desired, airControlFactor);
         player._velocity.x = Mathf.SmoothDamp(player._velocity.x, targetvelocity, ref player._smooothfactorx, _accelerationTimeAirborne);
 
         // # cuts jump short if jump was released early
@@ -73,7 +75,7 @@ public class FallState : PlayerState
             _jumpCut = false;
         }
 
-        // # [0-peak] -> modified gravity :: [peak-ground] -> applied normal gravity
+        // # [0-peak] -> normal gravity :: [peak-ground] -> applied modified gravity
         if(player._velocity.y < 0.0f){
             fallForce = player._velocity.y + player._gravity * Time.fixedDeltaTime * _gravityModifier;
 
@@ -81,13 +83,15 @@ public class FallState : PlayerState
             if (player.IsCollided() && !player.isGrounded() && Mathf.Abs(player.GetAxisDirections().x) > 0.1f) {
                 fallForce = -_wallInteractSpeed;
             }
+
+            if (fallForce > -_terminalMultiplier) Debug.Log(fallForce);
+            player._velocity.y = Mathf.Max(fallForce, -_terminalMultiplier);
+
         }
         else {
             fallForce = player._velocity.y + player._gravity * Time.fixedDeltaTime;
+            player._velocity.y = fallForce;
         }
-
-        // # terminal velocity
-        player._velocity.y = Mathf.Max(fallForce, -_terminalMultiplier);
     }
 
     public override void OnExit()

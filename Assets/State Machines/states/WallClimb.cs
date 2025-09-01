@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class WallClimbState : PlayerState
@@ -11,6 +12,7 @@ public class WallClimbState : PlayerState
 
     private Vector2 _nudgePushAtEdge;
     private Vector2 direciton;
+    bool facingRight;
 
     public WallClimbState(Player player, PlayerStateMachine state, PlayerStateList name, float climpUpSpeed, float climbDownSpeed, Vector2 wallHopOff)
         : base(player, state, name)
@@ -82,7 +84,7 @@ public class WallClimbState : PlayerState
         Vector2 direction = new Vector2(player.GetDireciton(), 0);
         int layerMask = LayerMask.GetMask("Obstacles");
 
-        bool facingRight = player.GetDireciton() == 1;
+        facingRight = player.GetDireciton() == 1;
 
         Vector2 top = facingRight
             ? new Vector2(col.bounds.max.x, col.bounds.max.y - offset)

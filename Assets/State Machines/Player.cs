@@ -149,4 +149,13 @@ public class Player : MonoBehaviour
             StartCoroutine(GameManager.instance.Respawn(1.10f, this.gameObject));
         }
     }
+
+    private void OnValidate()
+    {
+        _gravity = -(2 * _jumpHeight) / Mathf.Pow(_jumpDuration, 2);
+        _maxJumpVelocity = Mathf.Abs(_gravity) * _jumpDuration;
+
+
+        _jump_state = new JumpState(this, _stateMachine, _jumpHeight, _jumpDuration, _maxJumpVelocity);
+    }
 }
