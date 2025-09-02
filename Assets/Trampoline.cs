@@ -19,7 +19,9 @@ public class Trampoline : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
-            collision.GetComponent<Player>()._velocity.y = _force;
+            var player = collision.GetComponent<Player>();
+            player._velocity.y = _force;
+            player._isDashing = false;
 
             transform.position = _originalPosition;
             if (_squashRoutine != null) StopCoroutine(_squashRoutine);
@@ -41,6 +43,7 @@ public class Trampoline : MonoBehaviour
         Vector3 start = transform.position;
         float elapsed = 0f;
 
+        
         while (elapsed < _squashDuration)
         {
             elapsed += Time.deltaTime;

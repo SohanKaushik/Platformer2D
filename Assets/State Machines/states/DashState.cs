@@ -56,6 +56,8 @@ public class DashState : PlayerState
 
         yield return new WaitForSeconds(_dashDuration);
 
+        if (player._velocity.y > 0f)
+            player._velocity.y = player._velocity.y * 0.5f;
         stateMachine.ChangeStateTo(player._fall_state);
     }
 

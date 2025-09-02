@@ -33,10 +33,10 @@ public class Player : MonoBehaviour
     [HideInInspector] public Vector3 _velocity;
     [HideInInspector] public float _gravity = -1.0f;
 
-    public struct PublicContext {
-        public bool dashRequest;
-        public bool wallClimbHoldRequest;
-    } public PublicContext _context;
+    //public struct PublicContext {
+    //    public bool dashRequest;
+    //    public bool wallClimbHoldRequest;
+    //} public PublicContext _context;
 
     [HideInInspector] public float coyoteCounter;
     [HideInInspector] public float _smooothfactorx;
@@ -73,7 +73,6 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
-
         // # applied gravity
         _gravity = -(2 * _jumpHeight) / Mathf.Pow(_jumpDuration, 2);
         _maxJumpVelocity = Mathf.Abs(_gravity) * _jumpDuration;
@@ -104,6 +103,7 @@ public class Player : MonoBehaviour
         jumpBufferCounter = (PlayerInputManager().OnJumpTapped()) ? jumpBufferTime : jumpBufferCounter -= Time.deltaTime;
 
         wallClimbTimer = (IsWallClimbing()) ? wallClimbTimer -= Time.deltaTime : wallClimbTimer = wallClimbDuration;
+
     }
 
     void FixedUpdate() 

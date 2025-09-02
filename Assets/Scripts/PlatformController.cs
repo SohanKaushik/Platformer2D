@@ -1,67 +1,47 @@
-using System.Collections;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Unity.Cinemachine;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.Rendering.Universal;
 
-public abstract class PlatformController : RaycastController {
+public class PlatformController : RaycastController {
 
-    [SerializeField] private Vector2 _detectionRange;
-    //[SerializeField] private Vector2 _detectionOffset;
+    private Vector3 move;
+    [SerializeField] LayerMask passangerMask;
 
-    [SerializeField] LayerMask _layermask;
+    public override void Start()
+    {
+        base.Start();
 
-   public Vector3 _velocity = Vector3.down;
-   
+    }
 
-    private bool _detected;
-
-    protected virtual void FixedUpdate() {
-
+    private void Update()
+    {
         UpdateRayOrigins();
-        VerticalCollision(ref _velocity);
+
+        Vector3 velocity = move * Time.deltaTime;
+
+        MovePassangers(velocity);
+        transform.Translate(velocity);
     }
 
-    protected override void HorizontalCollision(ref Vector3 velocity)
-    {
-        float directionX = _colldata.direction;
+    void MovePassangers(Vector3 velocity) {
 
-        for (int i = 0; i < hraycount; i++)
+        var directions = new Vector2(Mathf.Sign(velocity.x), Mathf.Sign(velocity.y));
+
+        // # vertical
+        if (Mathf.Abs(velocity.y) < 0.1) return;
+
+        for (int i = 0; i < vraycount; i++)
         {
-            Vector2 rayo = (directionX == -1) ? _origins.bottomLeft : _origins.bottomRight;
-            rayo += Vector2.up * (hraySpacing * i);
-
-            RaycastHit2D hit = Physics2D.Raycast(rayo, Vector2.right * directionX, _detectionRange.x, _layermask);
-
-
-            if (hit)
-            {
-                Debug.Log(hit.transform.gameObject.name);
-            }
-            Debug.DrawRay(rayo, Vector2.up * directionX * _detectionRange.x, Color.blue);
-        }
-    }
-
-    protected override void VerticalCollision(ref Vector3 velocity)
-    {
-        float directionY = Mathf.Sign(velocity.y);
-
-        for (int i = 0; i < hraycount; i++)
-        {
-            Vector2 rayo = (directionY == -1) ? _origins.bottomLeft : _origins.topLeft;
+            var rayLength = Mathf.Abs(velocity.y) + skinWidth;
+            var rayo = (directions.y == 1) ? _origins.topLeft : _origins.bottomLeft;
             rayo += Vector2.right * (vraySpacing * i);
-
-            RaycastHit2D hit = Physics2D.Raycast(rayo, Vector2.up * directionY, _detectionRange.y, _layermask);
-
+            RaycastHit2D hit = Physics2D.Raycast(rayo, Vector2.up * directions.y, rayLength, passangerMask);
 
             if (hit)
             {
-                _detected = true;
+                var pushY = transform.position.y - (hit.distance - skinWidth) * directions.y;
+                var pushX = (directions.y == 1) ? velocity.x : 0;
+                transform.Translate(new Vector3(pushX, pushY));
             }
-            Debug.DrawRay(rayo, Vector2.up * directionY * _detectionRange.y, Color.red);
         }
     }
-
-    public bool isDetected() => _detected;
 }

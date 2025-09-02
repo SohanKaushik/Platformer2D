@@ -2,8 +2,9 @@ using UnityEngine;
 
 public class IdleState : PlayerState {
 
+    private Vector3 originialPlayerSize;
     public IdleState(Player player, PlayerStateMachine state) : base(player, state, PlayerStateList.Idle) {
-    
+        originialPlayerSize = player.transform.localScale;
     }
 
     public override void OnEnter() {
@@ -24,8 +25,15 @@ public class IdleState : PlayerState {
         //    return;
         //}
 
+        if (player.GetAxisDirections().y < 0.1 && player.GetAxisDirections().y != 0f)
+        {
+            player.GetComponent<SpriteRenderer>().size = new Vector3(originialPlayerSize.x, originialPlayerSize.y * 0.5f, originialPlayerSize.z);
+        }
+        else player.GetComponent<SpriteRenderer>().size = originialPlayerSize;
+
         // # jump && dash
-        if (player.jumpBufferCounter > 0.0f) {
+        if (player.jumpBufferCounter > 0.0f)
+        {
             stateMachine.ChangeStateTo(player._jump_state);
             return;
         }

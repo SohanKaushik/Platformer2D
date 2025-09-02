@@ -41,7 +41,7 @@ public class Controller2D : RaycastController
         transform.Translate(velocity, Space.World);
     }
 
-    protected override void VerticalCollision(ref Vector3 velocity)
+    protected void VerticalCollision(ref Vector3 velocity)
     {
         float directionY = Mathf.Sign(velocity.y);
         float raylength = Mathf.Abs(velocity.y) + skinWidth;
@@ -74,7 +74,7 @@ public class Controller2D : RaycastController
         }
     }
 
-    protected override void HorizontalCollision(ref Vector3 velocity)
+    protected void HorizontalCollision(ref Vector3 velocity)
     {
         float directionX = _colldata.direction;
         float raylength = Mathf.Abs(velocity.x) + skinWidth;

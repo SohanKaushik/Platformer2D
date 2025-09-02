@@ -2,7 +2,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(BoxCollider2D))]
-public abstract class RaycastController : MonoBehaviour
+public class RaycastController : MonoBehaviour
 {
     protected int vraycount = 4;
     protected int hraycount = 4;
@@ -74,8 +74,4 @@ public abstract class RaycastController : MonoBehaviour
             slopeAngle = 0f;
         }
     }
-
-    // Abstract methods — must be implemented in derived class
-    protected abstract void HorizontalCollision(ref Vector3 velocity);
-    protected abstract void VerticalCollision(ref Vector3 velocity);
 }
