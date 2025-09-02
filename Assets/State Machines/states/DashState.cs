@@ -34,7 +34,7 @@ public class DashState : PlayerState
         {
             player._velocity = _dashDirection * _dashForce;
 
-            //// idk if it actually works
+            // idk if it actually works
             //if (player.IsCollided()) { 
             //    player._velocity = Vector3.zero;
             //    player._stateMachine.ChangeStateTo(player._fall_state);

@@ -8,6 +8,7 @@ public class FallState : PlayerState
     private float _accelerationTimeAirborne = 0.05f;
 
     private float _wallInteractSpeed = 10.0f;
+    private float targetvelocity;
 
     public FallState(Player player, PlayerStateMachine state, float terminalMultiplier, float accelerationTimeAirborne)
         : base(player, state, PlayerStateList.Falling)
@@ -64,10 +65,7 @@ public class FallState : PlayerState
         var fallForce = 0f;
 
         float desired = player.GetAxisDirections().x * player._footSpeed;
-        float airControlFactor = 0.66f; // tune between 0 (no control) and 1 (full control)
-
-        var targetvelocity = Mathf.Lerp(player._velocity.x, desired, airControlFactor);
-        player._velocity.x = Mathf.SmoothDamp(player._velocity.x, targetvelocity, ref player._smooothfactorx, _accelerationTimeAirborne);
+        float airControlFactor = 0.5f; // tune between 0 (no control) and 1 (full control)
 
         // # cuts jump short if jump was released early
         if (_jumpCut) {
@@ -83,15 +81,16 @@ public class FallState : PlayerState
             if (player.IsCollided() && !player.isGrounded() && Mathf.Abs(player.GetAxisDirections().x) > 0.1f) {
                 fallForce = -_wallInteractSpeed;
             }
-
-            if (fallForce > -_terminalMultiplier) Debug.Log(fallForce);
             player._velocity.y = Mathf.Max(fallForce, -_terminalMultiplier);
-
+            targetvelocity = Mathf.Lerp(player._velocity.x, desired, airControlFactor);
         }
         else {
             fallForce = player._velocity.y + player._gravity * Time.fixedDeltaTime;
+            targetvelocity = desired;
             player._velocity.y = fallForce;
         }
+
+        player._velocity.x = Mathf.SmoothDamp(player._velocity.x, targetvelocity, ref player._smooothfactorx, _accelerationTimeAirborne);
     }
 
     public override void OnExit()
