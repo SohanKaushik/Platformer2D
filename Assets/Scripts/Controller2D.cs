@@ -30,8 +30,8 @@ public class Controller2D : RaycastController
             DescendSlope(ref velocity);
         }
 
-        HorizontalCollision(ref velocity);
         VerticalCollision(ref velocity);
+        HorizontalCollision(ref velocity);
 
         // [] Flip
         transform.rotation = Quaternion.Euler(0f, _colldata.direction == -1 ? 180f : 0f, 0f);
@@ -44,35 +44,67 @@ public class Controller2D : RaycastController
     protected void VerticalCollision(ref Vector3 velocity)
     {
         float directionY = Mathf.Sign(velocity.y);
-        float raylength = Mathf.Abs(velocity.y) + skinWidth;
+        float rayLength = Mathf.Abs(velocity.y) + skinWidth;
 
         if (velocity.y == 0) directionY = -1f;
+
+        bool firstHit = false, lastHit = false;
+
         for (int i = 0; i < vraycount; i++)
         {
             Vector2 rayo = (directionY == -1) ? _origins.bottomLeft : _origins.topLeft;
             rayo += Vector2.right * (vraySpacing * i);
 
-            RaycastHit2D hit = Physics2D.Raycast(rayo, Vector2.up * directionY, raylength, _layermask);
-
+            RaycastHit2D hit = Physics2D.Raycast(rayo, Vector2.up * directionY, rayLength, _layermask);
 
             if (hit)
             {
-                velocity.y = (hit.distance - skinWidth) * directionY;
-                raylength = hit.distance;
-
-
-                if (_colldata.ascendingSlope)
-                {
-                    velocity.x = velocity.y / Mathf.Tan(_colldata.slopeAngle * Mathf.Deg2Rad) * Mathf.Sign(velocity.x);
-                }
-
                 _colldata.above = directionY == 1;
                 _colldata.below = directionY == -1;
-            }
 
-            Debug.DrawRay(rayo, Vector2.up * directionY * raylength, Color.green);
+                if (i == 0 && _colldata.above) firstHit = true;
+                if (i == vraycount - 1 && _colldata.above) lastHit = true;
+
+                Debug.DrawRay(rayo, Vector2.up * directionY * rayLength, Color.green);
+            }
+        }
+
+        // # edge detection
+        if (firstHit ^ lastHit) // Edge case
+        {
+            // Preserve Y, just nudge horizontally
+            Debug.Log("heh");
+            velocity.x += (firstHit ? +0.8f : -0.8f);
+        }
+        else
+        {
+            // Normal ceiling/floor collision
+            for (int i = 0; i < vraycount; i++)
+            {
+                Vector2 rayo = (directionY == -1) ? _origins.bottomLeft : _origins.topLeft;
+                rayo += Vector2.right * (vraySpacing * i);
+
+                RaycastHit2D hit = Physics2D.Raycast(rayo, Vector2.up * directionY, rayLength, _layermask);
+
+                if (hit)
+                {
+                    velocity.y = (hit.distance - skinWidth) * directionY;
+                    rayLength = hit.distance;
+
+                    if (_colldata.ascendingSlope)
+                    {
+                        velocity.x = velocity.y / Mathf.Tan(_colldata.slopeAngle * Mathf.Deg2Rad) * Mathf.Sign(velocity.x);
+                    }
+
+                    _colldata.above = directionY == 1;
+                    _colldata.below = directionY == -1;
+
+                    Debug.DrawRay(rayo, Vector2.up * directionY * rayLength, Color.red);
+                }
+            }
         }
     }
+
 
     protected void HorizontalCollision(ref Vector3 velocity)
     {

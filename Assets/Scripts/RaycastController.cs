@@ -4,8 +4,8 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider2D))]
 public class RaycastController : MonoBehaviour
 {
-    protected int vraycount = 4;
-    protected int hraycount = 4;
+    public int vraycount = 4;
+    public int hraycount = 4;
 
     public RayOrigins _origins;
     public CollisionData _colldata;
@@ -18,6 +18,8 @@ public class RaycastController : MonoBehaviour
     {
         _collider = GetComponent<BoxCollider2D>();
         _colldata.direction = 1;
+
+        CalculateRaySpacing();
     }
 
     private void Update()
@@ -62,6 +64,7 @@ public class RaycastController : MonoBehaviour
 
         public bool ascendingSlope, descendingSlope;
         public float slopeAngle, slopeAngleOld;
+
         public void reset()
         {
             right = left = false;

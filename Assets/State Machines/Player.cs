@@ -87,7 +87,7 @@ public class Player : MonoBehaviour
     {
         _stateMachine._currentState.Update();
         if (!isGrounded() ) {
-            if (_controller._colldata.above) _velocity.y = 0.01f;
+            //if (_controller._colldata.above) _velocity.y = 0.01f;
             if(_stateMachine._currentState != _fall_state && !IsWallClimbAllowed() && !_isDashing)
             _stateMachine.ChangeStateTo(_fall_state);
         }

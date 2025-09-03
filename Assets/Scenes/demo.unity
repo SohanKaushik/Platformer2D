@@ -2951,8 +2951,8 @@ Transform:
   m_GameObject: {fileID: 947254135}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -27.0701, y: 27.0851, z: 0}
-  m_LocalScale: {x: 5, y: 4, z: 1}
+  m_LocalPosition: {x: -38.8, y: 17.58, z: 0}
+  m_LocalScale: {x: 5, y: 1.4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 293502600}
@@ -2969,6 +2969,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ba64b1280ead2a44867e46b132530d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  vraycount: 8
+  hraycount: 8
+  passangerMask:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!61 &947254138
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -5960,11 +5965,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 418070076481624029, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -21.05
+      value: -27.56
       objectReference: {fileID: 0}
     - target: {fileID: 418070076481624029, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 11.55
+      value: 12.7
       objectReference: {fileID: 0}
     - target: {fileID: 418070076481624029, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: m_LocalPosition.z
@@ -6398,7 +6403,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 15.850917
+  orthographic size: 15.850919
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -6423,7 +6428,7 @@ Transform:
   m_GameObject: {fileID: 2000719624}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.18, y: 16.22, z: -10}
+  m_LocalPosition: {x: -9.924955, y: 21.248253, z: -10.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
