@@ -58,6 +58,7 @@ public class Player : MonoBehaviour
     private Controller2D _controller;
     private PlayerInputSystem _inputhandler;
 
+    public bool onPlatform;
     void Awake()
     {
         _stateMachine = new PlayerStateMachine();
@@ -86,6 +87,7 @@ public class Player : MonoBehaviour
     private void Update()
     {
         _stateMachine._currentState.Update();
+
         if (!isGrounded() ) {
             //if (_controller._colldata.above) _velocity.y = 0.01f;
             if(_stateMachine._currentState != _fall_state && !IsWallClimbAllowed() && !_isDashing)
@@ -140,6 +142,15 @@ public class Player : MonoBehaviour
 
     public bool IsCollided() {
         return (_controller._colldata.right || _controller._colldata.left);
+    }
+
+    public bool IsTouchingCeiling() { 
+        return _controller._colldata.above;
+    }
+
+    public void SetIsGrounded(bool isGrounded)
+    {
+        _controller._colldata.below = isGrounded;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

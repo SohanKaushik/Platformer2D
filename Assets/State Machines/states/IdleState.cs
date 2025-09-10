@@ -13,18 +13,14 @@ public class IdleState : PlayerState {
         player._smooothfactorx = 0.0f;
         
         player._isDashing = false;
+        //player.SetIsGrounded(true);
         player._wallClimbTimeout = false;
     }
 
 
     public override void Update()
     {
-        //// # dash
-        //if (player._context.dashRequest) {
-        //    stateMachine.ChangeStateTo(player._dash_state);
-        //    return;
-        //}
-
+        // # bruh
         if (player.GetAxisDirections().y < 0.1 && player.GetAxisDirections().y != 0f)
         {
             player.GetComponent<SpriteRenderer>().size = new Vector3(originialPlayerSize.x, originialPlayerSize.y * 0.5f, originialPlayerSize.z);
@@ -39,7 +35,7 @@ public class IdleState : PlayerState {
         }
 
         // # dash
-        if (player.IsDashAllowed() || player.jumpBufferCounter >= 0.0f) {
+        if (player.IsDashAllowed()) {
             stateMachine.ChangeStateTo(player._dash_state);
             return;
         }

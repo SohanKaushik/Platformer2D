@@ -22,6 +22,7 @@ public class Controller2D : RaycastController
         UpdateRayOrigins();
         _colldata.reset();
 
+
         if (velocity.x != 0) {
             _colldata.direction = (int)Mathf.Sign(velocity.x);
         }
@@ -43,6 +44,8 @@ public class Controller2D : RaycastController
 
     protected void VerticalCollision(ref Vector3 velocity)
     {
+        if (_colldata.moving) return;
+
         float directionY = Mathf.Sign(velocity.y);
         float rayLength = Mathf.Abs(velocity.y) + skinWidth;
 
@@ -65,20 +68,18 @@ public class Controller2D : RaycastController
                 if (i == 0 && _colldata.above) firstHit = true;
                 if (i == vraycount - 1 && _colldata.above) lastHit = true;
 
-                Debug.DrawRay(rayo, Vector2.up * directionY * rayLength, Color.green);
+                //Debug.DrawRay(rayo, Vector2.up * directionY * rayLength, Color.green);
             }
         }
 
         // # edge detection
-        if (firstHit ^ lastHit) // Edge case
+        if (firstHit ^ lastHit)
         {
-            // Preserve Y, just nudge horizontally
-            Debug.Log("heh");
             velocity.x += (firstHit ? +0.8f : -0.8f);
         }
+        // # preserving vertical velocity when edge collided
         else
         {
-            // Normal ceiling/floor collision
             for (int i = 0; i < vraycount; i++)
             {
                 Vector2 rayo = (directionY == -1) ? _origins.bottomLeft : _origins.topLeft;

@@ -24,7 +24,9 @@ public class WallClimbState : PlayerState
 
     public override void OnEnter()
     {
-        player._velocity = Vector3.zero;
+        if (!player.onPlatform) {
+            player._velocity = Vector3.zero;
+        }
         _nudgePushAtEdge = new Vector2 (player.GetDireciton() * 10f, 20);
     }
 
@@ -47,6 +49,13 @@ public class WallClimbState : PlayerState
             stateMachine.ChangeStateTo(player._fall_state);
             return;
         }
+
+        // # dash
+        if (player.IsDashAllowed())
+        {
+            stateMachine.ChangeStateTo(player._dash_state);
+            return;
+        }
     }
 
     public override void FixedUpdate()
@@ -59,9 +68,17 @@ public class WallClimbState : PlayerState
         if (_wallJumped) {
             _wallJumped = false;
 
-            player._velocity = (Mathf.Abs(direciton.x) > 0.1) ? 
-                new Vector2(-player.GetDireciton() * _wallJumpForce.x, _wallJumpForce.y) :
-                new Vector2(0, 70);
+            if (player.IsTouchingCeiling())
+            {
+                Debug.Log("touch");
+                player._velocity = new Vector2(player.GetAxisDirections().x * _wallJumpForce.x, 0);
+            }
+            else
+            {
+                player._velocity = (Mathf.Abs(direciton.x) > 0.1) ?
+                    new Vector2(-player.GetDireciton() * _wallJumpForce.x, _wallJumpForce.y) :
+                    new Vector2(0, 70);
+            }
             return;
         }
 

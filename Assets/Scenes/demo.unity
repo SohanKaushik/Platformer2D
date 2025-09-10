@@ -2760,7 +2760,7 @@ SpriteRenderer:
   m_Size: {x: 12.8, y: 7.68}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &834122367
@@ -2951,8 +2951,8 @@ Transform:
   m_GameObject: {fileID: 947254135}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -38.8, y: 17.58, z: 0}
-  m_LocalScale: {x: 5, y: 1.4, z: 1}
+  m_LocalPosition: {x: -39.61, y: 25.3, z: 0}
+  m_LocalScale: {x: 5, y: 2.5611598, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 293502600}
@@ -2971,6 +2971,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   vraycount: 8
   hraycount: 8
+  move: {x: 1, y: 0, z: 0}
   passangerMask:
     serializedVersion: 2
     m_Bits: 256
@@ -5969,7 +5970,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 418070076481624029, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 12.7
+      value: 22.41
       objectReference: {fileID: 0}
     - target: {fileID: 418070076481624029, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: m_LocalPosition.z
@@ -6009,7 +6010,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1480422456467982231, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: _gravity
-      value: -78.125
+      value: -88.888885
       objectReference: {fileID: 0}
     - target: {fileID: 1480422456467982231, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: _dashSpeed
@@ -6033,7 +6034,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1480422456467982231, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: _jumpDuration
-      value: 0.32
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 1480422456467982231, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: _minJumpHeight
@@ -6049,7 +6050,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1480422456467982231, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: _terminalVelocity
-      value: 27
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 1480422456467982231, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: wallClimbDuration

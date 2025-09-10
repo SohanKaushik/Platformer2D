@@ -62,6 +62,7 @@ public class RaycastController : MonoBehaviour
         public bool right, left;
         public int direction;
 
+        public bool moving;
         public bool ascendingSlope, descendingSlope;
         public float slopeAngle, slopeAngleOld;
 
@@ -69,6 +70,8 @@ public class RaycastController : MonoBehaviour
         {
             right = left = false;
             below = above = false;
+
+            moving = false;
 
             ascendingSlope = false;
             descendingSlope = false;
