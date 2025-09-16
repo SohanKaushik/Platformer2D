@@ -68,17 +68,9 @@ public class WallClimbState : PlayerState
         if (_wallJumped) {
             _wallJumped = false;
 
-            if (player.IsTouchingCeiling())
-            {
-                Debug.Log("touch");
-                player._velocity = new Vector2(player.GetAxisDirections().x * _wallJumpForce.x, 0);
-            }
-            else
-            {
-                player._velocity = (Mathf.Abs(direciton.x) > 0.1) ?
-                    new Vector2(-player.GetDireciton() * _wallJumpForce.x, _wallJumpForce.y) :
-                    new Vector2(0, 70);
-            }
+            player._velocity = (Mathf.Abs(direciton.x) > 0.1) ?
+                new Vector2(-player.GetDireciton() * _wallJumpForce.x, _wallJumpForce.y) :
+                new Vector2(0, 70);
             return;
         }
 

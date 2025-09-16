@@ -1,5 +1,6 @@
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 [RequireComponent(typeof(BoxCollider2D))]
 public class RaycastController : MonoBehaviour
@@ -66,12 +67,15 @@ public class RaycastController : MonoBehaviour
         public bool ascendingSlope, descendingSlope;
         public float slopeAngle, slopeAngleOld;
 
+        public bool ceilingHit;
+
         public void reset()
         {
             right = left = false;
             below = above = false;
 
             moving = false;
+            ceilingHit = false;
 
             ascendingSlope = false;
             descendingSlope = false;

@@ -33,10 +33,6 @@ public class Player : MonoBehaviour
     [HideInInspector] public Vector3 _velocity;
     [HideInInspector] public float _gravity = -1.0f;
 
-    //public struct PublicContext {
-    //    public bool dashRequest;
-    //    public bool wallClimbHoldRequest;
-    //} public PublicContext _context;
 
     [HideInInspector] public float coyoteCounter;
     [HideInInspector] public float _smooothfactorx;
@@ -88,8 +84,8 @@ public class Player : MonoBehaviour
     {
         _stateMachine._currentState.Update();
 
-        if (!isGrounded() ) {
-            //if (_controller._colldata.above) _velocity.y = 0.01f;
+        if (!isGrounded()) {
+            if (IsTouchingCeiling()) _velocity.y = 0.01f;
             if(_stateMachine._currentState != _fall_state && !IsWallClimbAllowed() && !_isDashing)
             _stateMachine.ChangeStateTo(_fall_state);
         }

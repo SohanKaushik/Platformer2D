@@ -16,6 +16,7 @@ public class RoomTrigger : MonoBehaviour
     {
         if (other.CompareTag("Player") && !other.isTrigger)
         {
+            Debug.Log("sndak");
             _camera.SetActive(false);
         }
     }
