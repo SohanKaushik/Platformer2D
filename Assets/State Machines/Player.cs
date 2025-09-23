@@ -117,7 +117,7 @@ public class Player : MonoBehaviour
 
     public PlayerInputSystem PlayerInputManager() => _inputhandler;
     public int GetDireciton() => _controller._colldata.direction;
-    public bool isGrounded() => _controller._isGrounded;
+    public bool isGrounded() => _controller.IsGrounded();
 
     public bool IsWallClimbAllowed() {
         return (_controller._colldata.right || _controller._colldata.left)

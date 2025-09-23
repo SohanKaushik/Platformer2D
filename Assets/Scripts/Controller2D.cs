@@ -8,41 +8,42 @@ public class Controller2D : RaycastController
 {
 
     [SerializeField] LayerMask _layermask;
-    public bool _isGrounded;
     private float _maxClimbAngle = 80f;
-
+    private bool _is_grounded;
 
     public override void Start()
     {
         base.Start();
     }
 
-    public void move(Vector3 velocity, bool standingOnPlatorm = false)
+    public void move(Vector3 velocity, bool standing_on_platform = false)
     {
         UpdateRayOrigins();
         _colldata.reset();
 
-
-        if (velocity.x != 0) {
+        if (velocity.x != 0)
+        {
             _colldata.direction = (int)Mathf.Sign(velocity.x);
         }
 
-        if (velocity.y <= 0 || !_colldata.below) {
+        if (velocity.y <= 0 || !_colldata.below)
+        {
             DescendSlope(ref velocity);
         }
 
         VerticalCollision(ref velocity);
         HorizontalCollision(ref velocity);
 
+
         // [] Flip
         transform.rotation = Quaternion.Euler(0f, _colldata.direction == -1 ? 180f : 0f, 0f);
 
-        if(standingOnPlatorm) _colldata.below = true;
-        if(isSlopeCaptured()) _colldata.below = true;
-        _isGrounded = _colldata.below;
+        _is_grounded = _colldata.below;
         transform.Translate(velocity, Space.World);
+        if (standing_on_platform) _is_grounded = _colldata.below = true;
     }
 
+   
     protected void VerticalCollision(ref Vector3 velocity)
     {
         float directionY = Mathf.Sign(velocity.y);
@@ -59,7 +60,7 @@ public class Controller2D : RaycastController
 
             RaycastHit2D hit = Physics2D.Raycast(rayo, Vector2.up * directionY, rayLength, _layermask);
 
-            if (hit)
+            if (hit && hit.distance >= 0)
             {
                 _colldata.above = directionY == 1;
                 _colldata.below = directionY == -1;
@@ -72,37 +73,37 @@ public class Controller2D : RaycastController
 
         // # edge detection
         // # preserving vertical velocity when edge collided
-       if (firstHit ^ lastHit)
-       {
-           velocity.x += (firstHit ? +0.75f : -0.75f);
-       }
-       else
-       {
-           for (int i = 0; i < vraycount; i++)
-           {
-               Vector2 rayo = (directionY == -1) ? _origins.bottomLeft : _origins.topLeft;
-               rayo += Vector2.right * (vraySpacing * i);
+        if (firstHit ^ lastHit)
+        {
+            velocity.x += (firstHit ? +0.75f : -0.75f);
+        }
+        else
+        {
+            for (int i = 0; i < vraycount; i++)
+            {
+                Vector2 rayo = (directionY == -1) ? _origins.bottomLeft : _origins.topLeft;
+                rayo += Vector2.right * (vraySpacing * i);
 
-               RaycastHit2D hit = Physics2D.Raycast(rayo, Vector2.up * directionY, rayLength, _layermask);
+                RaycastHit2D hit = Physics2D.Raycast(rayo, Vector2.up * directionY, rayLength, _layermask);
 
-               if (hit)
-               {
-                   velocity.y = (hit.distance - skinWidth) * directionY;
-                   rayLength = hit.distance;
+                if (!hit || hit.distance == 0) continue;
+                
+                    velocity.y = (hit.distance - skinWidth) * directionY;
+                    rayLength = hit.distance;
 
-                   if (_colldata.ascendingSlope)
-                   {
-                       velocity.x = velocity.y / Mathf.Tan(_colldata.slopeAngle * Mathf.Deg2Rad) * Mathf.Sign(velocity.x);
-                   }
+                    if (_colldata.ascendingSlope)
+                    {
+                        velocity.x = velocity.y / Mathf.Tan(_colldata.slopeAngle * Mathf.Deg2Rad) * Mathf.Sign(velocity.x);
+                    }
 
-                   _colldata.above = directionY == 1;
-                   _colldata.below = directionY == -1;
-                    
-                    if(_colldata.above) _colldata.ceilingHit = true;
-                   Debug.DrawRay(rayo, Vector2.up * directionY * rayLength, Color.red);
-               }
-           }
-       }
+                    _colldata.above = directionY == 1;
+                    _colldata.below = directionY == -1;
+
+                    if (_colldata.above) _colldata.ceilingHit = true;
+                    Debug.DrawRay(rayo, Vector2.up * directionY * rayLength, Color.red);
+                
+            }
+        }
     }
 
 
@@ -113,7 +114,7 @@ public class Controller2D : RaycastController
 
         if (Mathf.Abs(velocity.x) < skinWidth)
         {
-            raylength = 2 * skinWidth; 
+            raylength = 2 * skinWidth;
         }
 
         for (int i = 0; i < hraycount; i++)
@@ -182,10 +183,12 @@ public class Controller2D : RaycastController
 
         float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
         if (slopeAngle == 0 || slopeAngle > _maxClimbAngle) return;
-        if (Mathf.Sign(hit.normal.x) == Mathf.Sign(_colldata.direction)) {
+        if (Mathf.Sign(hit.normal.x) == Mathf.Sign(_colldata.direction))
+        {
 
-           // hit distance < perpendicular distance
-           if(hit.distance - skinWidth <= Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x)) {
+            // hit distance < perpendicular distance
+            if (hit.distance - skinWidth <= Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x))
+            {
 
                 // constant speed throughout the slope
                 var _speed = Mathf.Abs(velocity.x);
@@ -195,13 +198,23 @@ public class Controller2D : RaycastController
 
                 _colldata.slopeAngle = slopeAngle;
                 _colldata.descendingSlope = true;
-           }    
+            }
         }
     }
 
 
     public bool isSlopeCaptured()
     {
-       return (_colldata.ascendingSlope || _colldata.descendingSlope);
+        return (_colldata.ascendingSlope || _colldata.descendingSlope);
+    }
+
+    public bool isRidingPlatform(bool riding)
+    {
+        return riding;
+    }
+
+    public bool IsGrounded()
+    {
+        return _is_grounded;
     }
 }

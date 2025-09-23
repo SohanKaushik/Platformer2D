@@ -5,15 +5,20 @@ using UnityEngine.Rendering;
 [RequireComponent(typeof(BoxCollider2D))]
 public class RaycastController : MonoBehaviour
 {
+    public LayerMask collisionMask;
+    public const float skinWidth = 0.015f;
+    
     public int vraycount = 4;
     public int hraycount = 4;
 
     public RayOrigins _origins;
     public CollisionData _colldata;
 
-    private BoxCollider2D _collider;
-    protected float skinWidth = 0.015f;
-    protected float vraySpacing, hraySpacing;
+    [HideInInspector]
+    public BoxCollider2D _collider;
+
+    [HideInInspector]
+    public float vraySpacing, hraySpacing;
 
     public virtual void Start()
     {
@@ -22,12 +27,6 @@ public class RaycastController : MonoBehaviour
 
         CalculateRaySpacing();
     }
-
-    private void Update()
-    {
-        CalculateRaySpacing();
-    }
-
     public void UpdateRayOrigins()
     {
         Bounds bounds = _collider.bounds;
