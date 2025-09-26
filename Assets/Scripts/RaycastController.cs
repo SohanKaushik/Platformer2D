@@ -67,6 +67,7 @@ public class RaycastController : MonoBehaviour
         public float slopeAngle, slopeAngleOld;
 
         public bool ceilingHit;
+        public bool standing_on_platform;
 
         public void reset()
         {
@@ -81,6 +82,8 @@ public class RaycastController : MonoBehaviour
 
             slopeAngleOld = slopeAngle;
             slopeAngle = 0f;
+
+            standing_on_platform = false;
         }
     }
 }

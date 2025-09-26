@@ -24,9 +24,9 @@ public class WallClimbState : PlayerState
 
     public override void OnEnter()
     {
-        if (!player.onPlatform) {
-            player._velocity = Vector3.zero;
-        }
+        //if (!player.onPlatform) {
+        //}
+        player._velocity = Vector3.zero;
         _nudgePushAtEdge = new Vector2 (player.GetDireciton() * 10f, 20);
     }
 

@@ -54,7 +54,6 @@ public class Player : MonoBehaviour
     private Controller2D _controller;
     private PlayerInputSystem _inputhandler;
 
-    public bool onPlatform;
     void Awake()
     {
         _stateMachine = new PlayerStateMachine();
@@ -114,6 +113,10 @@ public class Player : MonoBehaviour
     {
         return _inputhandler.GetMoveInput();
     }
+    public void ApplyPlatformBoost(float percentage, Vector3 boost)
+    {
+        _velocity += boost * Mathf.Pow(percentage,2);
+    }
 
     public PlayerInputSystem PlayerInputManager() => _inputhandler;
     public int GetDireciton() => _controller._colldata.direction;
@@ -143,18 +146,16 @@ public class Player : MonoBehaviour
     public bool IsTouchingCeiling() { 
         return _controller._colldata.above;
     }
-
-    public void SetIsGrounded(bool isGrounded)
-    {
-        _controller._colldata.below = isGrounded;
-    }
-
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Hazard")) {
             GameManager.instance.NotifyDeath();
             StartCoroutine(GameManager.instance.Respawn(1.10f, this.gameObject));
         }
+    }
+    public bool IsStandingOnPlatform()
+    {
+        return _controller._colldata.standing_on_platform;
     }
 
     private void OnValidate()

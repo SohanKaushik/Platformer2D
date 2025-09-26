@@ -8,6 +8,8 @@ public class Controller2D : RaycastController
 {
 
     [SerializeField] LayerMask _layermask;
+  
+
     private float _maxClimbAngle = 80f;
     private bool _is_grounded;
 
@@ -16,7 +18,7 @@ public class Controller2D : RaycastController
         base.Start();
     }
 
-    public void move(Vector3 velocity, bool standing_on_platform = false)
+    public void move(Vector3 velocity)
     {
         UpdateRayOrigins();
         _colldata.reset();
@@ -34,16 +36,40 @@ public class Controller2D : RaycastController
         VerticalCollision(ref velocity);
         HorizontalCollision(ref velocity);
 
+        // [] Flip
+        transform.rotation = Quaternion.Euler(0f, _colldata.direction == -1 ? 180f : 0f, 0f);
+
+        _is_grounded = _colldata.below;
+        transform.Translate(velocity, Space.World);
+    }
+
+    public void move(Vector3 velocity, bool _standing_on_platform)
+    {
+        UpdateRayOrigins();
+        _colldata.reset();
+
+        if (velocity.x != 0)
+        {
+            _colldata.direction = (int)Mathf.Sign(velocity.x);
+        }
+
+        if (velocity.y <= 0 || !_colldata.below)
+        {
+            DescendSlope(ref velocity);
+        }
+
+        VerticalCollision(ref velocity);
+        HorizontalCollision(ref velocity);
 
         // [] Flip
         transform.rotation = Quaternion.Euler(0f, _colldata.direction == -1 ? 180f : 0f, 0f);
 
         _is_grounded = _colldata.below;
         transform.Translate(velocity, Space.World);
-        if (standing_on_platform) _is_grounded = _colldata.below = true;
+        if (_standing_on_platform) _is_grounded = _colldata.below = true;
+        _colldata.standing_on_platform = _standing_on_platform;
     }
 
-   
     protected void VerticalCollision(ref Vector3 velocity)
     {
         float directionY = Mathf.Sign(velocity.y);
@@ -101,7 +127,6 @@ public class Controller2D : RaycastController
 
                     if (_colldata.above) _colldata.ceilingHit = true;
                     Debug.DrawRay(rayo, Vector2.up * directionY * rayLength, Color.red);
-                
             }
         }
     }
@@ -208,9 +233,9 @@ public class Controller2D : RaycastController
         return (_colldata.ascendingSlope || _colldata.descendingSlope);
     }
 
-    public bool isRidingPlatform(bool riding)
+    public bool IsStandingOnPlatform()
     {
-        return riding;
+        return _colldata.standing_on_platform;
     }
 
     public bool IsGrounded()
