@@ -1,7 +1,9 @@
+using Unity.Cinemachine;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
+[RequireComponent(typeof(CinemachineImpulseSource))]
 public class PlatformController : RaycastController
 {
 
@@ -10,7 +12,7 @@ public class PlatformController : RaycastController
     [SerializeField]
     Vector3[] _localWaypoints;
     Vector3[] _globalWaypoints;
-    
+
     [SerializeField] AnimationCurve _easing;
 
     PassangersData _passanger = new PassangersData();
@@ -26,30 +28,40 @@ public class PlatformController : RaycastController
     private Vector3 velocity;
     private float boost_buffer = 0.3f;
 
-    private Vector3 _last_velocity;
+    private CinemachineImpulseSource _impulseSource;
+
+    private bool _isTriggered;
+    private Vector3 _origin_pos;
 
     public override void Start()
     {
         base.Start();
 
         _globalWaypoints = new Vector3[_localWaypoints.Length];
-        for (int i = 0; i < _localWaypoints.Length; i++) {
+        _origin_pos = transform.position;
+        for (int i = 0; i < _localWaypoints.Length; i++)
+        {
             _globalWaypoints[i] = _localWaypoints[i] + transform.position;
         }
         _platform.speed = _speed;
+        _impulseSource = GetComponent<CinemachineImpulseSource>();
     }
 
     private void FixedUpdate()
     {
+        if(!_isTriggered && IsPlatformReturned()) return; 
+
+        //...........
         UpdateRayOrigins();
 
         velocity = EvaluatePlatformMovement();
         EvaluatePassangerMovement(velocity);
 
-
         MovePassanger(true);
         transform.Translate(velocity);
         MovePassanger(false);
+
+        IsPlatformReturned();
     }
 
     private float Ease(float t)
@@ -62,46 +74,65 @@ public class PlatformController : RaycastController
     {
         if (Time.time < _nextMoveTime) {
             boost_buffer -= Time.fixedDeltaTime;
-            return Vector3.zero;    
+            return Vector3.zero;
         }
 
         _platform.fromWayPointIndex %= _globalWaypoints.Length;
-        var toWaypointIndex = (_platform.fromWayPointIndex + 1) % _globalWaypoints.Length; // 0 + 1 = 1
-        var distanceBetweenWaypoints = Vector3.Distance(_globalWaypoints[_platform.fromWayPointIndex], _globalWaypoints[toWaypointIndex]);
+        int toWaypointIndex = (_platform.fromWayPointIndex + 1) % _globalWaypoints.Length;
+
+        Vector3 startPos = _globalWaypoints[_platform.fromWayPointIndex];
+        Vector3 endPos = _globalWaypoints[toWaypointIndex];
+        Vector3 moveDirection = (endPos - startPos).normalized;
+
+        float distanceBetweenWaypoints = Vector3.Distance(startPos, endPos);
         _platform.percentageBetweenWaypoints += Time.fixedDeltaTime * _platform.speed / distanceBetweenWaypoints;
-        var _easedPercentageBetweenWaypoints = Ease(_platform.percentageBetweenWaypoints);
 
-        var position = Vector3.Lerp(_globalWaypoints[_platform.fromWayPointIndex], _globalWaypoints[toWaypointIndex], _easedPercentageBetweenWaypoints);
+        float easedPercent = Ease(_platform.percentageBetweenWaypoints);
+        Vector3 _position = Vector3.Lerp(startPos, endPos, easedPercent);
 
-        if (_platform.percentageBetweenWaypoints >= 1) {
-            _platform.percentageBetweenWaypoints = 0;
+        if (_platform.percentageBetweenWaypoints >= 1)
+        {
             _platform.fromWayPointIndex++;
-            boost_buffer = 0.3f;
+            _platform.percentageBetweenWaypoints = 0;
+            _impulseSource.GenerateImpulse(velocity);
 
+            //// Only apply boost/impulse if moving upward
+            //if (moveDirection.y > 0)
+            //{
+            //    if (_impulseSource != null)
 
-            if (!_cyclic)
-            {
-                if (_platform.fromWayPointIndex >= _globalWaypoints.Length - 1)  {
+            //    boost_buffer = 0.3f;
+            //}
 
-                    System.Array.Reverse(_globalWaypoints);
-                    _platform.fromWayPointIndex = 0;
-                }
+            // cyclic handles
+            if (_cyclic && _platform.fromWayPointIndex >= _globalWaypoints.Length - 1) {
+                _platform.fromWayPointIndex = 0;
+                System.Array.Reverse(_globalWaypoints);    
             }
-           
+
+            // non_cyclic handles
+            if (_platform.fromWayPointIndex >= _globalWaypoints.Length - 1) {
+               this.enabled = false;
+            }
+
             _nextMoveTime = Time.time + _waitTime;
         }
-        return position - transform.position;
+
+        return _position - transform.position;
     }
+
     void MovePassanger(bool beforeMovePlatform)
     {
 
         if (!_passanger.transform) return;
-        if (_passanger.moveBeforePlatform == beforeMovePlatform) {
+        if (_passanger.moveBeforePlatform == beforeMovePlatform)
+        {
 
             var _player = _passanger.transform.GetComponent<Player>();
-            if (_player._stateMachine._currentState._name == PlayerStateList.Jumping) {
+            if (_player._stateMachine._currentState._name == PlayerStateList.Jumping)
+            {
                 OnPlayerJump(_player);
-            } 
+            }
             _passanger.transform.GetComponent<Controller2D>().move(_passanger.velocity, _passanger.onPlatform);
         }
     }
@@ -149,9 +180,9 @@ public class PlatformController : RaycastController
                 {
                     float pushX = velocity.x - (hit.distance - skinWidth) * directionX;
                     float pushY = -skinWidth;
-                    
-                   _passanger = new PassangersData(hit.transform, new Vector3(pushX, pushY), false, true);
-                 }
+
+                    _passanger = new PassangersData(hit.transform, new Vector3(pushX, pushY), false, true);
+                }
             }
         }
 
@@ -180,46 +211,76 @@ public class PlatformController : RaycastController
         }
     }
 
-    struct PassangersData {
-        public Transform transform; 
+    struct PassangersData
+    {
+        public Transform transform;
         public Vector3 velocity;
         public bool onPlatform;
         public bool moveBeforePlatform;
 
-        public PassangersData(Transform _transform, Vector3 _velocity, bool _onPlatform, bool _moveBeforePlatformm) {
+        public PassangersData(Transform _transform, Vector3 _velocity, bool _onPlatform, bool _moveBeforePlatformm)
+        {
             transform = _transform;
             velocity = _velocity;
             onPlatform = _onPlatform;
             moveBeforePlatform = _moveBeforePlatformm;
         }
     }
-    
-    struct PlatformData {
+
+    struct PlatformData
+    {
         public float speed;
         public int fromWayPointIndex;
-        public float percentageBetweenWaypoints;    
+        public float percentageBetweenWaypoints;
     }
 
     private void OnDrawGizmos()
     {
-        if(_localWaypoints == null) return;
+        if (_localWaypoints == null) return;
 
         Gizmos.color = Color.yellow;
         var _size = 0.3f;
 
-        for (int i = 0; i < _localWaypoints.Length; i++) {
+        for (int i = 0; i < _localWaypoints.Length; i++)
+        {
             var globalPos = (Application.isPlaying) ? _globalWaypoints[i] : _localWaypoints[i] + transform.position;
             Gizmos.DrawLine(globalPos - Vector3.up * _size, globalPos + Vector3.up * _size);
             Gizmos.DrawLine(globalPos - Vector3.left * _size, globalPos + Vector3.left * _size);
         }
     }
 
+    private void OnTriggerEnter2D(Collider2D _collision)
+    {
+        if (_collision.CompareTag("Player")) {
+            _isTriggered = true;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D _collision)
+    {
+        if (_collision.CompareTag("Player")) {
+            _isTriggered = false;
+        }
+    }
+
     public void OnPlayerJump(Player player)
     {
-        if(boost_buffer >= 0)
-        {
-            player.ApplyPlatformBoost(1 , _boost * new Vector3(0,1,0));
+        if (boost_buffer >= 0) {
+            player.ApplyPlatformBoost(1, _boost * new Vector3(0, 1, 0));
         }
         else player.ApplyPlatformBoost(_platform.percentageBetweenWaypoints, _boost * velocity);
+    }
+    private bool IsPlatformReturned() {
+        if (_platform.fromWayPointIndex == 0 && Vector3.Distance(transform.position, _origin_pos) <= 0.001f) {
+            transform.position = _globalWaypoints[0];
+            return true;
+        }
+        return false;
+    }
+
+    public void reset()
+    {
+        transform.position = _globalWaypoints[0];
+        _platform.fromWayPointIndex = 0;
     }
 }

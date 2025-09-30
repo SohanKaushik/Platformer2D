@@ -10,6 +10,8 @@ public class DashState : PlayerState
     private CinemachineImpulseSource _impulseSource;
 
     private Vector2 _dashDirection;
+    Vector2 _NoInputDirection;
+
     private GhostTrailRenderer _trailRenderer;
 
     public DashState(Player player, PlayerStateMachine state, float dashSpeed, float dashDuration)
@@ -43,10 +45,13 @@ public class DashState : PlayerState
         _impulseSource.GenerateImpulse(player.GetAxisDirections() * 0.5f);
 
         Vector2 inputDir = player.GetAxisDirections();
-        _dashDirection = inputDir.magnitude > 0.1f
-            ? inputDir.normalized
-            : new Vector2(player.GetDireciton(), 0).normalized;
 
+        // # no direction input case
+        if(inputDir.magnitude < 0.1f) {
+            if(!player.isGrounded()) _dashDirection = new Vector2(0,1);
+            else _dashDirection = new Vector2(player.GetDireciton(), 0).normalized;
+        }
+        else _dashDirection = inputDir.normalized;
 
         yield return new WaitForSeconds(_dashDuration);
 
