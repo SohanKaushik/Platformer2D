@@ -7,9 +7,10 @@ public class RaycastController : MonoBehaviour
 {
     public LayerMask collisionMask;
     public const float skinWidth = 0.015f;
-    
-    public int vraycount = 4;
-    public int hraycount = 4;
+
+
+    [HideInInspector] public int vraycount = 4;
+    [HideInInspector] public int hraycount = 4;
 
     public RayOrigins _origins;
     public CollisionData _colldata;

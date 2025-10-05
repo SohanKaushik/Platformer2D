@@ -83,6 +83,8 @@ public class Player : MonoBehaviour
     {
         _stateMachine._currentState.Update();
 
+
+
         if (!isGrounded()) {
             if (IsTouchingCeiling()) _velocity.y = 0.01f;
             if(_stateMachine._currentState != _fall_state && !IsWallClimbAllowed() && !_isDashing)
@@ -103,23 +105,32 @@ public class Player : MonoBehaviour
 
     }
 
-    void FixedUpdate() 
+    void FixedUpdate()
     {
         _stateMachine._currentState.FixedUpdate();
+
+        // # facings
+        int facing = (Mathf.Abs(GetAxisDirections().x) > 0.1f && Mathf.Abs(_velocity.x) > 0.1f ? (int)Mathf.Sign(GetAxisDirections().x) : 0);
+        _controller.SetFacings(facing);
+
+        Debug.Log(IsWallClimbAllowed());
+        MovingPlatforms currentPlatform;
+        bool isRiding = _controller.IsRidingOnPlatform(out currentPlatform);
+
+
+        if (isRiding)
+        {
+            _velocity += currentPlatform.GetVelocity();
+        }
+
         _controller.move(_velocity * Time.fixedDeltaTime);
     }
 
-    public Vector2 GetAxisDirections()
-    {
-        return _inputhandler.GetMoveInput();
-    }
-    public void ApplyPlatformBoost(float percentage, Vector3 boost)
-    {
-        _velocity += boost * Mathf.Pow(percentage,2);
-    }
+    public Vector2 GetAxisDirections() => _inputhandler.GetMoveInput();
 
+    public PlayerStateList GetCurrentState() => _stateMachine._currentState._name;
     public PlayerInputSystem PlayerInputManager() => _inputhandler;
-    public int GetDireciton() => _controller._colldata.direction;
+    public int GetFacings() => _controller._colldata.direction;
     public bool isGrounded() => _controller.IsGrounded();
 
     public bool IsWallClimbAllowed() {
@@ -158,6 +169,9 @@ public class Player : MonoBehaviour
         return _controller._colldata.standing_on_platform;
     }
 
+
+   
+    //................
     private void OnValidate()
     {
         _gravity = -(2 * _jumpHeight) / Mathf.Pow(_jumpDuration, 2);

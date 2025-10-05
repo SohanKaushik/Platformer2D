@@ -14,6 +14,8 @@ public class WallClimbState : PlayerState
     private Vector2 direciton;
     bool facingRight;
 
+    int _origin_direction;
+
     public WallClimbState(Player player, PlayerStateMachine state, PlayerStateList name, float climpUpSpeed, float climbDownSpeed, Vector2 wallHopOff)
         : base(player, state, name)
     {
@@ -24,10 +26,10 @@ public class WallClimbState : PlayerState
 
     public override void OnEnter()
     {
-        if (!player.IsStandingOnPlatform()) {
-            player._velocity = Vector3.zero;
-        }
-        _nudgePushAtEdge = new Vector2 (player.GetDireciton() * 10f, 20);
+        _origin_direction = player.GetFacings();
+
+        player._velocity = Vector3.zero;
+        _nudgePushAtEdge = new Vector2(_origin_direction * 10f, 20);
     }
 
     public override void Update()
@@ -61,7 +63,7 @@ public class WallClimbState : PlayerState
     public override void FixedUpdate()
     {
         direciton = new Vector2((player.GetAxisDirections().x), (player.GetAxisDirections().y));
-
+        
         var downwardForce = _climbDownSpeed * direciton.y;
         var upwardForce = _climbUpSpeed * direciton.y;
 
@@ -69,7 +71,7 @@ public class WallClimbState : PlayerState
             _wallJumped = false;
 
             player._velocity = (Mathf.Abs(direciton.x) > 0.1) ?
-                new Vector2(-player.GetDireciton() * _wallJumpForce.x, _wallJumpForce.y) :
+                new Vector2(-_origin_direction * _wallJumpForce.x, _wallJumpForce.y) :
                 new Vector2(0, 70);
             return;
         }
@@ -90,10 +92,10 @@ public class WallClimbState : PlayerState
 
         float distance = 0.08f;
         float offset = 0f;
-        Vector2 direction = new Vector2(player.GetDireciton(), 0);
+        Vector2 direction = new Vector2(_origin_direction, 0);
         int layerMask = LayerMask.GetMask("Obstacles");
 
-        facingRight = player.GetDireciton() == 1;
+        facingRight = player.GetFacings() == 1;
 
         Vector2 top = facingRight
             ? new Vector2(col.bounds.max.x, col.bounds.max.y - offset)

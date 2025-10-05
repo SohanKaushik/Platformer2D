@@ -45,6 +45,8 @@ public class IdleState : PlayerState {
             stateMachine.ChangeStateTo(player._wall_climb_state);
             return;
         }
+
+        player._velocity.y = -0.1f;
     }
 
     public override void FixedUpdate() {

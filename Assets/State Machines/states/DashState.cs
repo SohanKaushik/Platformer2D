@@ -49,7 +49,7 @@ public class DashState : PlayerState
         // # no direction input case
         if(inputDir.magnitude < 0.1f) {
             if(!player.isGrounded()) _dashDirection = new Vector2(0,1);
-            else _dashDirection = new Vector2(player.GetDireciton(), 0).normalized;
+            else _dashDirection = new Vector2(player.GetFacings(), 0).normalized;
         }
         else _dashDirection = inputDir.normalized;
 
