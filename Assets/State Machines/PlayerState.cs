@@ -15,7 +15,8 @@ public abstract class PlayerState {
 
     public virtual void OnEnter() { }
     public virtual void Update() { }    
-    public virtual void FixedUpdate() { }
+    public virtual void LateUpdate() { }
+    public virtual void PhysicsUpdate() { }
     public virtual void OnCollisionEnter(){ }
     public virtual void OnExit() { }
 }

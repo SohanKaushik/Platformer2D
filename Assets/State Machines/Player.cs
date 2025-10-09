@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Controller2D), typeof(PlayerInputSystem))]
@@ -54,6 +55,9 @@ public class Player : MonoBehaviour
     private Controller2D _controller;
     private PlayerInputSystem _inputhandler;
 
+    public MovingPlatforms currentPlatform;
+    private int _last_facing;
+
     void Awake()
     {
         _stateMachine = new PlayerStateMachine();
@@ -81,56 +85,54 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        _stateMachine._currentState.Update();
-
-
-
-        if (!isGrounded()) {
-            if (IsTouchingCeiling()) _velocity.y = 0.01f;
-            if(_stateMachine._currentState != _fall_state && !IsWallClimbAllowed() && !_isDashing)
-            _stateMachine.ChangeStateTo(_fall_state);
-        }
-
-        // # totally hideous code here
+        // #1 - Early exit conditions first
         if (GameManager.instance.Notifications.death)
         {
             StartCoroutine(GameManager.instance.Respawn(0.4f, this.gameObject));
+            return;
         }
 
-        // [ Conditions ]
-        coyoteCounter = (isGrounded()) ? _coyoteTime : coyoteCounter -= Time.deltaTime;
-        jumpBufferCounter = (PlayerInputManager().OnJumpTapped()) ? jumpBufferTime : jumpBufferCounter -= Time.deltaTime;
+        #region Buffers
+        coyoteCounter = isGrounded() ? _coyoteTime : coyoteCounter - Time.deltaTime;
+        jumpBufferCounter = PlayerInputManager().OnJumpTapped() ? jumpBufferTime : jumpBufferCounter - Time.deltaTime;
+        wallClimbTimer = IsWallClimbing() ? wallClimbTimer - Time.deltaTime : wallClimbDuration;
+        #endregion
 
-        wallClimbTimer = (IsWallClimbing()) ? wallClimbTimer -= Time.deltaTime : wallClimbTimer = wallClimbDuration;
+        if (IsRidingOnPlatform() || IsRidingPlatformSideways())
+        {
+            transform.position += currentPlatform.GetVelocity();
+        }
 
-    }
+        
 
-    void FixedUpdate()
-    {
-        _stateMachine._currentState.FixedUpdate();
-
-        // # facings
-        int facing = (Mathf.Abs(GetAxisDirections().x) > 0.1f && Mathf.Abs(_velocity.x) > 0.1f ? (int)Mathf.Sign(GetAxisDirections().x) : 0);
+        int facing = (Mathf.Abs(GetAxisDirections().x) > 0.1f &&
+                     (_stateMachine._currentState._name != PlayerStateList.Dashing) &&
+                     Mathf.Abs(_velocity.x) > 0.1f) ?
+                     (int)Mathf.Sign(GetAxisDirections().x) : 0;
         _controller.SetFacings(facing);
 
-        Debug.Log(IsWallClimbAllowed());
-        MovingPlatforms currentPlatform;
-        bool isRiding = _controller.IsRidingOnPlatform(out currentPlatform);
+        _stateMachine._currentState.Update();
+        _stateMachine._currentState.PhysicsUpdate();
+        _controller.move(_velocity * Time.deltaTime);
+    }
 
-
-        if (isRiding)
+    private void LateUpdate()
+    {
+        _last_facing = GetFacings();
+        if (!isGrounded())
         {
-            _velocity += currentPlatform.GetVelocity();
+            if (IsTouchingCeiling()) _velocity.y = 0.01f;
+            if (_stateMachine._currentState != _fall_state && !IsWallClimbAllowed() && !_isDashing)
+                _stateMachine.ChangeStateTo(_fall_state);
         }
 
-        _controller.move(_velocity * Time.fixedDeltaTime);
+        _stateMachine._currentState.LateUpdate();
     }
 
     public Vector2 GetAxisDirections() => _inputhandler.GetMoveInput();
-
     public PlayerStateList GetCurrentState() => _stateMachine._currentState._name;
     public PlayerInputSystem PlayerInputManager() => _inputhandler;
-    public int GetFacings() => _controller._colldata.direction;
+    public int GetFacings() => _controller._colldata.facing;
     public bool isGrounded() => _controller.IsGrounded();
 
     public bool IsWallClimbAllowed() {
@@ -164,13 +166,21 @@ public class Player : MonoBehaviour
             StartCoroutine(GameManager.instance.Respawn(1.10f, this.gameObject));
         }
     }
-    public bool IsStandingOnPlatform()
+
+    public bool IsRidingOnPlatform()
     {
-        return _controller._colldata.standing_on_platform;
+        return _controller.CollideCheck<MovingPlatforms>(Vector2.down, out currentPlatform);
     }
 
+    public bool IsRidingPlatformSideways()
+    {
+        return _controller.CollideCheck<MovingPlatforms>(new Vector2(GetFacings(), 0), out currentPlatform);
+    }
 
-   
+    public void LockFacings(){
+        _controller.SetFacings(_last_facing);
+    }
+
     //................
     private void OnValidate()
     {

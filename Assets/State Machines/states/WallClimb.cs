@@ -60,7 +60,7 @@ public class WallClimbState : PlayerState
         }
     }
 
-    public override void FixedUpdate()
+    public override void PhysicsUpdate()
     {
         direciton = new Vector2((player.GetAxisDirections().x), (player.GetAxisDirections().y));
         
@@ -77,7 +77,7 @@ public class WallClimbState : PlayerState
         }
 
         if (HasReachedClimbTopEdge()) {
-            player._velocity = _nudgePushAtEdge;
+            player._velocity += (Vector3)_nudgePushAtEdge;
             return;
         }
         player._velocity.y = (direciton.y > 0.1) ? 

@@ -19,18 +19,26 @@ public class DashState : PlayerState
     {
         _dashForce = dashSpeed;
         _dashDuration = dashDuration;
+
+        _impulseSource = player.GetComponent<CinemachineImpulseSource>();
+        _trailRenderer = player.GetComponent<GhostTrailRenderer>();
     }
 
     public override void OnEnter()
     {
-        _impulseSource = player.GetComponent<CinemachineImpulseSource>();
-        _trailRenderer = player.GetComponent<GhostTrailRenderer>();
-
         player.StartCoroutine(DashCoroutine());
         _trailRenderer.DrawTrail(_dashDuration);
     }
 
-    public override void FixedUpdate()
+    public override void LateUpdate()
+    {
+        // # dashing to running
+        if(player.isGrounded() && Mathf.Abs(player.GetAxisDirections().x) > 0.1f){
+            Debug.Log("shhed");
+        }
+    }
+
+    public override void PhysicsUpdate()
     {
         if (player._isDashing)
         {
@@ -42,7 +50,7 @@ public class DashState : PlayerState
     private IEnumerator DashCoroutine()
     {
         player._isDashing = true;
-        _impulseSource.GenerateImpulse(player.GetAxisDirections() * 0.5f);
+        _impulseSource.GenerateImpulse(player.GetAxisDirections() * 0.35f);
 
         Vector2 inputDir = player.GetAxisDirections();
 

@@ -24,7 +24,7 @@ public class RaycastController : MonoBehaviour
     public virtual void Start()
     {
         _collider = GetComponent<BoxCollider2D>();
-        _colldata.direction = 1;
+        _colldata.facing = 1;
 
         CalculateRaySpacing();
     }
@@ -37,6 +37,9 @@ public class RaycastController : MonoBehaviour
         _origins.bottomRight = new Vector2(bounds.max.x, bounds.min.y);
         _origins.topLeft = new Vector2(bounds.min.x, bounds.max.y);
         _origins.topRight = new Vector2(bounds.max.x, bounds.max.y);
+
+        _origins.topCentre = new Vector2(_origins.topLeft.x/2, _origins.topRight.y /2);
+        _origins.bottomCentre = new Vector2(_origins.bottomLeft.x / 2, _origins.bottomRight.y / 2);
     }
 
     public void CalculateRaySpacing()
@@ -55,13 +58,14 @@ public class RaycastController : MonoBehaviour
     {
         public Vector2 topLeft, topRight;
         public Vector2 bottomLeft, bottomRight;
+        public Vector2 topCentre, bottomCentre;
     }
 
     public struct CollisionData
     {
         public bool below, above;
         public bool right, left;
-        public int direction;
+        public int facing;
 
         public bool moving;
         public bool ascendingSlope, descendingSlope;

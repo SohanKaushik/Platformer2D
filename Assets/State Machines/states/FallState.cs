@@ -17,27 +17,14 @@ public class FallState : PlayerState
         _accelerationTimeAirborne = accelerationTimeAirborne;
     }
 
+    private float _groundedBuffer = 0.05f; // 50 ms buffer
+    private float _lastAirTime = 0f;
+
     public override void Update()
     {
-        //// # dash
-        //if (player._context.dashRequest) {
-        //    stateMachine.ChangeStateTo(player._dash_state);
-        //    return;
-        //}
-
+        // # half jump
         if (player.PlayerInputManager().OnJumpReleased() && player._velocity.y > 0f) {
             _jumpCut = true;
-            return;
-        }
-
-        // # run or idle
-        if (player.isGrounded()) {
-            if (Mathf.Abs(player.GetAxisDirections().x) > 0.1f) {
-                stateMachine.ChangeStateTo(player._run_state);
-            }
-            else {
-                stateMachine.ChangeStateTo(player._idle_state);
-            }
             return;
         }
 
@@ -60,7 +47,7 @@ public class FallState : PlayerState
         }
     }
 
-    public override void FixedUpdate()
+    public override void PhysicsUpdate()
     {
         var fallForce = 0f;
 
@@ -75,7 +62,7 @@ public class FallState : PlayerState
 
         // # [0-peak] -> normal gravity :: [peak-ground] -> applied modified gravity
         if(player._velocity.y < 0.0f){
-            fallForce = player._velocity.y + player._gravity * Time.fixedDeltaTime * _gravityModifier;
+            fallForce = player._velocity.y + player._gravity * Time.deltaTime * _gravityModifier;
 
 
             if (player.IsCollided() && !player.isGrounded() && Mathf.Abs(player.GetAxisDirections().x) > 0.1f) {
@@ -85,7 +72,7 @@ public class FallState : PlayerState
             targetvelocity = Mathf.Lerp(player._velocity.x, desired, airControlFactor);
         }
         else {
-            fallForce = player._velocity.y + player._gravity * Time.fixedDeltaTime;
+            fallForce = player._velocity.y + player._gravity * Time.deltaTime;
             targetvelocity = desired;
             player._velocity.y = fallForce;
         }
@@ -93,10 +80,25 @@ public class FallState : PlayerState
         player._velocity.x = Mathf.SmoothDamp(player._velocity.x, targetvelocity, ref player._smooothfactorx, _accelerationTimeAirborne);
     }
 
+    public override void LateUpdate()
+    {
+        // # run or idle
+        if (player.isGrounded())
+        {
+            if (Mathf.Abs(player.GetAxisDirections().x) > 0.1f) {
+                stateMachine.ChangeStateTo(player._run_state);
+            }
+            else {
+                stateMachine.ChangeStateTo(player._idle_state);
+            }
+            return;
+        }
+    }
+
     public override void OnExit()
     {
         // # prevents accumulated y velocity to any other state
-        player._velocity.y = 0.0f;
+        player._velocity.y = -0.1f;
         player.GetComponent<SpriteRenderer>().color = Color.white;
     }
 }

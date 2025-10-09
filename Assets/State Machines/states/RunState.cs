@@ -22,11 +22,6 @@ public class RunState : PlayerState
 
     public override void Update()
     {
-        // # dash
-        //if (player._context.dashRequest) {
-        //    stateMachine.ChangeStateTo(player._dash_state);
-        //    return;
-        //}
 
         // # jump 
         if ((player.PlayerInputManager().OnJumpTapped() && player.coyoteCounter >= 0.0f) || player.jumpBufferCounter > 0.0f) { 
@@ -53,7 +48,7 @@ public class RunState : PlayerState
         }
     }
 
-    public override void FixedUpdate()
+    public override void PhysicsUpdate()
     {
         var targetvelocity = player.GetAxisDirections().x * _footSpeed;
         player._velocity.x = Mathf.SmoothDamp(

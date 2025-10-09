@@ -20,6 +20,14 @@ public class IdleState : PlayerState {
 
     public override void Update()
     {
+
+        // # dash
+        if (player.IsDashAllowed())
+        {
+            stateMachine.ChangeStateTo(player._dash_state);
+            return;
+        }
+
         // # bruh
         if (player.GetAxisDirections().y < 0.1 && player.GetAxisDirections().y != 0f)
         {
@@ -34,12 +42,6 @@ public class IdleState : PlayerState {
             return;
         }
 
-        // # dash
-        if (player.IsDashAllowed()) {
-            stateMachine.ChangeStateTo(player._dash_state);
-            return;
-        }
-
         // # wall climbing
         if (player.IsWallClimbAllowed()) {
             stateMachine.ChangeStateTo(player._wall_climb_state);
@@ -49,7 +51,7 @@ public class IdleState : PlayerState {
         player._velocity.y = -0.1f;
     }
 
-    public override void FixedUpdate() {
+    public override void PhysicsUpdate() {
 
         // # run
         if (Mathf.Abs(player.GetAxisDirections().x) > 0.1f) {

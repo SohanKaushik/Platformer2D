@@ -26,15 +26,12 @@ public class MovingPlatforms : PlatformController
         }    
         _original_position = _globalWaypoints[0];
     }
-    private void FixedUpdate()
+    private void Update()
     {
-        IsPassengerInTheWay();
        if(!_platform.triggered && IsPlatformReturned()) return;
 
         _velocity = EvaluatePlatformMovement();
         transform.Translate(_velocity, Space.World);
-
-        MovePassengers(_velocity);
     }
 
     public override float EvaluatePassengerMovement()
@@ -48,7 +45,7 @@ public class MovingPlatforms : PlatformController
         int toWaypointIndex = (_platform.fromWayPointIndex + 1) % _globalWaypoints.Length;
 
         float distanceBetweenWaypoints = Vector3.Distance(_globalWaypoints[toWaypointIndex], _globalWaypoints[_platform.fromWayPointIndex]);
-        _platform.percentageBetweenWaypoints += Time.fixedDeltaTime * (_speed / distanceBetweenWaypoints);
+        _platform.percentageBetweenWaypoints += Time.deltaTime * (_speed / distanceBetweenWaypoints);
 
         float easing = Ease(_platform.percentageBetweenWaypoints);
         
@@ -126,42 +123,5 @@ public class MovingPlatforms : PlatformController
         public int fromWayPointIndex;
         public float percentageBetweenWaypoints;
     }
-
-    private bool IsPassengerInTheWay()
-    {
-        float directionX = Mathf.Sign(_velocity.x);
-        float rayLength = Mathf.Abs(_velocity.x) + skinWidth;
-
-
-        if (Mathf.Abs(_velocity.x) < skinWidth)
-        {
-            rayLength = 2f * skinWidth;
-        }
-
-
-        for (int i = 0; i < hraycount; i++)
-        {
-            var rayo = (directionX == -1) ? _origins.bottomLeft : _origins.bottomRight;
-            rayo += Vector2.up * (hraySpacing * i);
-
-            RaycastHit2D hit = Physics2D.Raycast(rayo, Vector2.right * directionX, rayLength, passengerMask);
-
-            if (hit)
-            {
-                var pushX = _velocity.x - (hit.distance - skinWidth) * directionX;
-               // hit.transform.GetComponent<Controller2D>().move(_velocity);
-                return true;
-            }
-
-            Debug.DrawRay(rayo, Vector2.right * directionX * rayLength, Color.red);
-        }
-        return false;
-    }
-
     public Vector3 GetVelocity() => _velocity;
-    //private bool IsPassengerOnPlatform(Controller2D passenger)
-    //{
-    //    // Check if passenger is actually on top of the platform
-    //    return Physics2D.OverlapBox(transform.position, _collider.bounds.size, 0, passengerMask) != null;
-    //}
 }
