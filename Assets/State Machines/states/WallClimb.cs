@@ -77,7 +77,7 @@ public class WallClimbState : PlayerState
         }
 
         if (HasReachedClimbTopEdge()) {
-            player._velocity += (Vector3)_nudgePushAtEdge;
+            player._velocity = _nudgePushAtEdge;
             return;
         }
         player._velocity.y = (direciton.y > 0.1) ? 

@@ -5,6 +5,7 @@
 using JetBrains.Annotations;
 using System;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngineInternal;
@@ -76,7 +77,8 @@ public class Controller2D : RaycastController
         }
     }
 
-    private void MoveH(ref Vector3 velocity) {
+    private void MoveH(ref Vector3 velocity)
+    {
 
         float totalMoveH = velocity.x;
         float stepX = totalMoveH / 100f;
@@ -88,14 +90,14 @@ public class Controller2D : RaycastController
             transform.Translate(stepX * direction.x, 0, 0);
 
 
-            if (CollideCheck<BoxCollider2D>(direction, out _)) {
+            if (CollideCheck<BoxCollider2D>(direction, out _))
+            {
                 transform.Translate(-Mathf.Abs(stepX), 0, 0);
 
                 _colldata.right = direction.x == 1;
                 _colldata.left = direction.x == -1;
 
-                Debug.Log(direction);
-                break; 
+                break;
             }
 
             UpdateRayOrigins();
@@ -163,7 +165,7 @@ public class Controller2D : RaycastController
             _colldata.facing = dir;
     }
 
-    public bool CollideCheck<T>(Vector2 direction, out T component, out RaycastHit2D hit) where T : Component
+    public bool CollideCheck<T>(Vector2 direction, out T component, out RaycastHit2D hit, bool debug = false) where T : Component
     {
         component = null;
         Vector2 startOrigin;
@@ -199,7 +201,8 @@ public class Controller2D : RaycastController
             var origin = startOrigin + spreadDirection * (vraySpacing * i);
             RaycastHit2D rayHit = Physics2D.Raycast(origin, direction, rayLength, _layermask);
 
-            Debug.DrawRay(origin, direction * rayLength, Color.black);
+            if(debug)
+                Debug.DrawRay(origin, direction * rayLength, Color.green);
 
             if (rayHit)
             {
@@ -212,8 +215,8 @@ public class Controller2D : RaycastController
         return false;
     }
 
-    public bool CollideCheck<T>(Vector2 direction, out T component) where T : Component
+    public bool CollideCheck<T>(Vector2 direction, out T component, bool debug = false) where T : Component
     {
-        return CollideCheck(direction, out component, out _);
+        return CollideCheck(direction, out component, out _, debug);
     }
 }

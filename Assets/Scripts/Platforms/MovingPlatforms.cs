@@ -7,6 +7,7 @@ using UnityEngine;
 public class MovingPlatforms : PlatformController
 {
     private Vector3 _velocity;
+    private Vector3 _last_position;
 
     [SerializeField]
     Vector3[] _localWaypoints;
@@ -14,12 +15,12 @@ public class MovingPlatforms : PlatformController
 
     PlatformInformation _platform;
 
-    private HashSet<Controller2D> _passengers = new HashSet<Controller2D>();
+    public bool trigger;
 
     private void Start()
     {
         base.Start();
-
+        trigger = true;
         _globalWaypoints = new Vector3[_localWaypoints.Length];
         for (int i = 0; i < _localWaypoints.Length; i++) {
             _globalWaypoints[i] = _localWaypoints[i] + transform.position;
@@ -28,10 +29,12 @@ public class MovingPlatforms : PlatformController
     }
     private void Update()
     {
-       if(!_platform.triggered && IsPlatformReturned()) return;
+       if(!trigger && IsPlatformReturned()) return;
 
         _velocity = EvaluatePlatformMovement();
         transform.Translate(_velocity, Space.World);
+
+        _last_position = transform.position;
     }
 
     public override float EvaluatePassengerMovement()
@@ -79,27 +82,10 @@ public class MovingPlatforms : PlatformController
 
     public override void MovePassengers(Vector3 dv)
     {
-        //foreach (var passenger in _passengers)
-        //{
-        //    passenger.move(dv, true);
-        //}
-    }
-
-
-    private void OnTriggerEnter2D(Collider2D col)
-    {
-        _platform.triggered = true;
-        if (col.CompareTag("Player")) { 
-            _passengers.Add(col.GetComponent<Controller2D>());
-        }
-    }
-
-    private void OnTriggerExit2D(Collider2D col)
-    {
-        _platform.triggered = false;
-        if (col.CompareTag("Player")) { 
-            _passengers.Remove(col.GetComponent<Controller2D>());
-        }
+       //foreach (var passenger in _passengers)
+       //{
+       //    passenger.move(dv, true);
+       //}
     }
 
     private void OnDrawGizmos()
@@ -123,5 +109,5 @@ public class MovingPlatforms : PlatformController
         public int fromWayPointIndex;
         public float percentageBetweenWaypoints;
     }
-    public Vector3 GetVelocity() => _velocity;
+    public Vector3 GetDeltaMovement() => _velocity;
 }

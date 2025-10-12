@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 
 [RequireComponent(typeof(Controller2D), typeof(PlayerInputSystem))]
@@ -85,6 +86,11 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        if (IsRidingOnPlatform())
+        {
+            transform.position += currentPlatform.GetDeltaMovement();
+        }
+
         // #1 - Early exit conditions first
         if (GameManager.instance.Notifications.death)
         {
@@ -98,19 +104,16 @@ public class Player : MonoBehaviour
         wallClimbTimer = IsWallClimbing() ? wallClimbTimer - Time.deltaTime : wallClimbDuration;
         #endregion
 
-        if (IsRidingOnPlatform() || IsRidingPlatformSideways())
-        {
-            transform.position += currentPlatform.GetVelocity();
-        }
+    
 
-        
+
 
         int facing = (Mathf.Abs(GetAxisDirections().x) > 0.1f &&
                      (_stateMachine._currentState._name != PlayerStateList.Dashing) &&
                      Mathf.Abs(_velocity.x) > 0.1f) ?
                      (int)Mathf.Sign(GetAxisDirections().x) : 0;
         _controller.SetFacings(facing);
-
+      
         _stateMachine._currentState.Update();
         _stateMachine._currentState.PhysicsUpdate();
         _controller.move(_velocity * Time.deltaTime);
@@ -118,6 +121,7 @@ public class Player : MonoBehaviour
 
     private void LateUpdate()
     {
+
         _last_facing = GetFacings();
         if (!isGrounded())
         {
@@ -125,7 +129,7 @@ public class Player : MonoBehaviour
             if (_stateMachine._currentState != _fall_state && !IsWallClimbAllowed() && !_isDashing)
                 _stateMachine.ChangeStateTo(_fall_state);
         }
-
+    
         _stateMachine._currentState.LateUpdate();
     }
 
@@ -135,33 +139,39 @@ public class Player : MonoBehaviour
     public int GetFacings() => _controller._colldata.facing;
     public bool isGrounded() => _controller.IsGrounded();
 
-    public bool IsWallClimbAllowed() {
+    public bool IsWallClimbAllowed()
+    {
         return (_controller._colldata.right || _controller._colldata.left)
          && !_wallClimbTimeout
          && !_controller._colldata.ascendingSlope
          && PlayerInputManager().IsWallClimbHeld();
     }
 
-    public bool IsDashAllowed() {
+    public bool IsDashAllowed()
+    {
         return !_isDashing
             && !(_stateMachine._currentState == _dash_state)
             && PlayerInputManager().OnDashTapped();
     }
 
-    public bool IsWallClimbing(){
+    public bool IsWallClimbing()
+    {
         return (_stateMachine._currentState == _wall_climb_state) ? true : false;
     }
 
-    public bool IsCollided() {
+    public bool IsCollided()
+    {
         return (_controller._colldata.right || _controller._colldata.left);
     }
 
-    public bool IsTouchingCeiling() { 
+    public bool IsTouchingCeiling()
+    {
         return _controller._colldata.above;
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Hazard")) {
+        if (collision.CompareTag("Hazard"))
+        {
             GameManager.instance.NotifyDeath();
             StartCoroutine(GameManager.instance.Respawn(1.10f, this.gameObject));
         }
@@ -169,7 +179,7 @@ public class Player : MonoBehaviour
 
     public bool IsRidingOnPlatform()
     {
-        return _controller.CollideCheck<MovingPlatforms>(Vector2.down, out currentPlatform);
+        return _controller.CollideCheck<MovingPlatforms>(Vector2.down * Mathf.Sign(_velocity.x), out currentPlatform, true);
     }
 
     public bool IsRidingPlatformSideways()
@@ -177,7 +187,8 @@ public class Player : MonoBehaviour
         return _controller.CollideCheck<MovingPlatforms>(new Vector2(GetFacings(), 0), out currentPlatform);
     }
 
-    public void LockFacings(){
+    public void LockFacings()
+    {
         _controller.SetFacings(_last_facing);
     }
 
