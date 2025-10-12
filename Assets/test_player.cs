@@ -4,6 +4,7 @@ using UnityEngine.Rendering;
 public class test_player : Controller2D
 {
     public MovingPlatforms _currentPlatform;
+    public float speed;
 
     private void Start()
     {
@@ -12,18 +13,19 @@ public class test_player : Controller2D
 
     void Update()
     {
-        var input = Input.GetAxisRaw("Horizontal");
+        var input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         
        if (_currentPlatform != null && isGrounded())
        {
-           transform.position += (Vector3)_currentPlatform.GetDeltaMovement() + new Vector3(input, 0, 0) * Time.deltaTime;
+           transform.position += (Vector3)_currentPlatform.GetDeltaMovement();
        }
+
+        transform.Translate(input * speed * Time.deltaTime);
         UpdateRayOrigins();
     }
 
     bool isGrounded()
     {
-        Debug.Log(01010);
         float rayLength = 0.1f + skinWidth;
 
         for (int i = 0; i < hraycount; i++)

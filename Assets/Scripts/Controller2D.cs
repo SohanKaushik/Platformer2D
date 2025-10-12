@@ -58,7 +58,7 @@ public class Controller2D : RaycastController
         {
             Vector3 stepVelocity = new Vector3(0, stepY, 0);
 
-            if (CollideCheck<BoxCollider2D>(new Vector2(0, directionY), out _))
+            if (CollideCheck<BoxCollider2D>(Vector3.zero, new Vector2(0, directionY), out _))
             {
                 //transform.Translate(0, -Mathf.Abs(stepY) * directionY, 0);
 
@@ -90,7 +90,7 @@ public class Controller2D : RaycastController
             transform.Translate(stepX * direction.x, 0, 0);
 
 
-            if (CollideCheck<BoxCollider2D>(direction, out _))
+            if (CollideCheck<BoxCollider2D>(Vector3.zero, direction, out _))
             {
                 transform.Translate(-Mathf.Abs(stepX), 0, 0);
 
@@ -165,11 +165,11 @@ public class Controller2D : RaycastController
             _colldata.facing = dir;
     }
 
-    public bool CollideCheck<T>(Vector2 direction, out T component, out RaycastHit2D hit, bool debug = false) where T : Component
+    public bool CollideCheck<T>(Vector3 offset, Vector2 direction, out T component, out RaycastHit2D hit, bool debug = false) where T : Component
     {
         component = null;
-        Vector2 startOrigin;
-        Vector2 spreadDirection;
+        Vector3 startOrigin;
+        Vector3 spreadDirection;
         hit = new RaycastHit2D();
 
         switch (direction)
@@ -198,7 +198,7 @@ public class Controller2D : RaycastController
 
         for (int i = 0; i < vraycount; i++)
         {
-            var origin = startOrigin + spreadDirection * (vraySpacing * i);
+            var origin = (startOrigin + offset) + spreadDirection * (vraySpacing * i);
             RaycastHit2D rayHit = Physics2D.Raycast(origin, direction, rayLength, _layermask);
 
             if(debug)
@@ -215,8 +215,8 @@ public class Controller2D : RaycastController
         return false;
     }
 
-    public bool CollideCheck<T>(Vector2 direction, out T component, bool debug = false) where T : Component
+    public bool CollideCheck<T>(Vector3 offset, Vector3 direction, out T component, bool debug = false) where T : Component
     {
-        return CollideCheck(direction, out component, out _, debug);
+        return CollideCheck(offset,direction, out component, out _, debug);
     }
 }

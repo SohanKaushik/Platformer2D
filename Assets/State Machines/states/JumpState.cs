@@ -17,6 +17,7 @@ public class JumpState : PlayerState
 
     public override void OnEnter()
     {
+        if (player.IsRidingOnPlatform()) player._velocity = Vector3.zero;
         player._velocity.y = _maxJumpVelocity;
         player._isDashing = false;
     }

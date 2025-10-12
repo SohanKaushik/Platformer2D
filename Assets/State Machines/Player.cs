@@ -86,7 +86,7 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        if (IsRidingOnPlatform())
+        if (IsRidingOnPlatform() || IsRidingPlatformSideways())
         {
             transform.position += currentPlatform.GetDeltaMovement();
         }
@@ -179,13 +179,14 @@ public class Player : MonoBehaviour
 
     public bool IsRidingOnPlatform()
     {
-        return _controller.CollideCheck<MovingPlatforms>(Vector2.down * Mathf.Sign(_velocity.x), out currentPlatform, true);
+        var offset = (currentPlatform) ? currentPlatform.GetDeltaMovement() : Vector3.zero;
+        return _controller.CollideCheck<MovingPlatforms>(offset,Vector2.down, out currentPlatform, true);
     }
 
-    public bool IsRidingPlatformSideways()
-    {
-        return _controller.CollideCheck<MovingPlatforms>(new Vector2(GetFacings(), 0), out currentPlatform);
-    }
+   public bool IsRidingPlatformSideways()
+   {
+       return _controller.CollideCheck<MovingPlatforms>(Vector3.zero, new Vector2(GetFacings(), 0), out currentPlatform);
+   }
 
     public void LockFacings()
     {
