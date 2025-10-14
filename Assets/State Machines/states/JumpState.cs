@@ -17,16 +17,21 @@ public class JumpState : PlayerState
 
     public override void OnEnter()
     {
-        if (player.IsRidingOnPlatform()) player._velocity = Vector3.zero;
         player._velocity.y = _maxJumpVelocity;
+        player._velocity += player.LiftBoost;
+
         player._isDashing = false;
+
+        player.currentPlatform = null;
     }
 
     public override void Update()
     {
-        if (player.IsWallClimbAllowed()) {
+        if (player.IsWallClimbAllowed())
+        {
             stateMachine.ChangeStateTo(player._wall_climb_state);
             return;
         }
+        else stateMachine.ChangeStateTo(player._fall_state);
     }
 }

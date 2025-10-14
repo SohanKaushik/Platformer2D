@@ -29,6 +29,7 @@ public class WallClimbState : PlayerState
         _origin_direction = player.GetFacings();
 
         player._velocity = Vector3.zero;
+        player._liftBoosted = false;
         _nudgePushAtEdge = new Vector2(_origin_direction * 10f, 20);
     }
 

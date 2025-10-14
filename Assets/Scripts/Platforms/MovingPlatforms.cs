@@ -16,6 +16,7 @@ public class MovingPlatforms : PlatformController
     PlatformInformation _platform;
 
     public bool trigger;
+    private Vector3 _last_velocity;
 
     private void Start()
     {
@@ -34,6 +35,11 @@ public class MovingPlatforms : PlatformController
         _velocity = EvaluatePlatformMovement();
         transform.Translate(_velocity, Space.World);
 
+        if (_velocity.magnitude <= 0f) {
+            _velocity = _last_velocity;
+        }
+        else 
+            _last_velocity = _velocity;
         _last_position = transform.position;
     }
 
@@ -44,6 +50,7 @@ public class MovingPlatforms : PlatformController
 
     public override Vector3 EvaluatePlatformMovement()
     {
+
         _platform.fromWayPointIndex %= _globalWaypoints.Length;
         int toWaypointIndex = (_platform.fromWayPointIndex + 1) % _globalWaypoints.Length;
 
@@ -110,4 +117,8 @@ public class MovingPlatforms : PlatformController
         public float percentageBetweenWaypoints;
     }
     public Vector3 GetDeltaMovement() => _velocity;
+    public Vector3 GetVelocity()
+    {
+        return _last_velocity / Time.deltaTime;
+    }
 }

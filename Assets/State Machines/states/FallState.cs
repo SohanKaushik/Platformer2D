@@ -10,6 +10,8 @@ public class FallState : PlayerState
     private float _wallInteractSpeed = 10.0f;
     private float targetvelocity;
 
+    float airControlFactor = 0.5f;
+
     public FallState(Player player, PlayerStateMachine state, float terminalMultiplier, float accelerationTimeAirborne)
         : base(player, state, PlayerStateList.Falling)
     {
@@ -49,36 +51,60 @@ public class FallState : PlayerState
 
     public override void PhysicsUpdate()
     {
-        var fallForce = 0f;
-
+        float gravityToApply = player._gravity;
         float desired = player.GetAxisDirections().x * player._footSpeed;
-        float airControlFactor = 0.5f; // tune between 0 (no control) and 1 (full control)
+        float airControlFactor = 0.5f;
 
-        // # cuts jump short if jump was released early
-        if (_jumpCut) {
+        // --- Jump cut ---
+        if (_jumpCut && player._velocity.y > 0f)
+        {
             player._velocity.y *= 0.5f;
             _jumpCut = false;
         }
 
-        // # [0-peak] -> normal gravity :: [peak-ground] -> applied modified gravity
-        if(player._velocity.y < 0.0f){
-            fallForce = player._velocity.y + player._gravity * Time.deltaTime * _gravityModifier;
 
+        // stronger gravity when falling
+        if (player._velocity.y < -1.0f)
+        {
+            gravityToApply *= _gravityModifier;
 
-            if (player.IsCollided() && !player.isGrounded() && Mathf.Abs(player.GetAxisDirections().x) > 0.1f) {
-                fallForce = -_wallInteractSpeed;
+            // Wall sliding
+            if (player.IsCollided())
+            {
+                if(!player.isGrounded() && Mathf.Abs(player.GetAxisDirections().x) > 0.1f) { 
+                     player._velocity.y = Mathf.Max(player._velocity.y, -_wallInteractSpeed);
+                }
+
+                if (player._liftBoosted) {
+                    player._liftBoosted = false;
+                    player._velocity = Vector3.zero;
+                } 
             }
-            player._velocity.y = Mathf.Max(fallForce, -_terminalMultiplier);
+        }
+
+        // applied gravity
+        player._velocity.y += gravityToApply * Time.deltaTime;
+
+        // terminal velocity
+        player._velocity.y = Mathf.Max(player._velocity.y, -_terminalMultiplier);
+
+        // horizontal whatever
+        if (player._liftBoosted)
+        {
+            targetvelocity = player._velocity.x;
+        }
+        else if (player._velocity.y < 0f)
+        {
             targetvelocity = Mathf.Lerp(player._velocity.x, desired, airControlFactor);
         }
-        else {
-            fallForce = player._velocity.y + player._gravity * Time.deltaTime;
+        else
+        {
             targetvelocity = desired;
-            player._velocity.y = fallForce;
         }
 
         player._velocity.x = Mathf.SmoothDamp(player._velocity.x, targetvelocity, ref player._smooothfactorx, _accelerationTimeAirborne);
     }
+
 
     public override void LateUpdate()
     {

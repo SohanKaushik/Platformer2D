@@ -46,6 +46,11 @@ public class Player : MonoBehaviour
     [HideInInspector] public bool _wallClimbTimeout;
     [HideInInspector] public float wallClimbTimer;
 
+    [Header("Lift Boost Caps")]
+    [SerializeField] private float _liftXCap = 80f;
+    [SerializeField] private float _liftYCap = -130f;
+
+    #region variables
     [Header("Wall Climb")]
     public float wallClimbDuration;
     public float wallClimbUpSpeed;
@@ -57,7 +62,9 @@ public class Player : MonoBehaviour
     private PlayerInputSystem _inputhandler;
 
     public MovingPlatforms currentPlatform;
+    public bool _liftBoosted;
     private int _last_facing;
+    #endregion
 
     void Awake()
     {
@@ -103,10 +110,6 @@ public class Player : MonoBehaviour
         jumpBufferCounter = PlayerInputManager().OnJumpTapped() ? jumpBufferTime : jumpBufferCounter - Time.deltaTime;
         wallClimbTimer = IsWallClimbing() ? wallClimbTimer - Time.deltaTime : wallClimbDuration;
         #endregion
-
-    
-
-
 
         int facing = (Mathf.Abs(GetAxisDirections().x) > 0.1f &&
                      (_stateMachine._currentState._name != PlayerStateList.Dashing) &&
@@ -185,12 +188,34 @@ public class Player : MonoBehaviour
 
    public bool IsRidingPlatformSideways()
    {
-       return _controller.CollideCheck<MovingPlatforms>(Vector3.zero, new Vector2(GetFacings(), 0), out currentPlatform);
+        return _controller.CollideCheck<MovingPlatforms>(Vector3.zero, new Vector2(GetFacings(), 0), out currentPlatform);
    }
 
     public void LockFacings()
     {
         _controller.SetFacings(_last_facing);
+    }
+
+    public Vector3 LiftBoost
+    {
+        get
+        {
+            if (!currentPlatform) {
+                return Vector3.zero; }
+
+            Vector3 platformVelocity = currentPlatform.GetVelocity();
+            Vector3 liftBoost = platformVelocity;
+
+            if (Mathf.Abs(liftBoost.x) > _liftXCap)
+                liftBoost.x = _liftXCap * Mathf.Sign(liftBoost.x);
+
+            if (Mathf.Abs(liftBoost.y) > _liftYCap)
+                liftBoost.y = _liftYCap;
+
+            _liftBoosted = true;
+            Debug.Log(liftBoost);
+            return liftBoost;
+        }
     }
 
     //................
