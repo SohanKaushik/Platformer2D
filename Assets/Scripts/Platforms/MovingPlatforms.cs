@@ -21,7 +21,6 @@ public class MovingPlatforms : PlatformController
     private void Start()
     {
         base.Start();
-        trigger = true;
         _globalWaypoints = new Vector3[_localWaypoints.Length];
         for (int i = 0; i < _localWaypoints.Length; i++) {
             _globalWaypoints[i] = _localWaypoints[i] + transform.position;
@@ -119,6 +118,11 @@ public class MovingPlatforms : PlatformController
     public Vector3 GetDeltaMovement() => _velocity;
     public Vector3 GetVelocity()
     {
-        return _last_velocity / Time.deltaTime;
+        return _last_velocity;
+    }
+
+    private void LateUpdate()
+    {
+        trigger = false;
     }
 }

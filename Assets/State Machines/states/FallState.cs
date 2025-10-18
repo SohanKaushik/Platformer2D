@@ -4,7 +4,7 @@ public class FallState : PlayerState
 {
     private bool _jumpCut;
     private float _terminalMultiplier;
-    private float _gravityModifier = 1.8f;
+    private float _gravityModifier = 2f;
     private float _accelerationTimeAirborne = 0.05f;
 
     private float _wallInteractSpeed = 10.0f;
@@ -64,7 +64,7 @@ public class FallState : PlayerState
 
 
         // stronger gravity when falling
-        if (player._velocity.y < -1.0f)
+        if (player._velocity.y < 0f)
         {
             gravityToApply *= _gravityModifier;
 
@@ -74,6 +74,10 @@ public class FallState : PlayerState
                 if(!player.isGrounded() && Mathf.Abs(player.GetAxisDirections().x) > 0.1f) { 
                      player._velocity.y = Mathf.Max(player._velocity.y, -_wallInteractSpeed);
                 }
+
+                //if (player.PlayerInputManager().OnJumpTapped()) { 
+                //    player._velocity = new Vector3(-player.GetFacings() * 2f, 10f, 0);
+                //}
 
                 if (player._liftBoosted) {
                     player._liftBoosted = false;
@@ -89,11 +93,7 @@ public class FallState : PlayerState
         player._velocity.y = Mathf.Max(player._velocity.y, -_terminalMultiplier);
 
         // horizontal whatever
-        if (player._liftBoosted)
-        {
-            targetvelocity = player._velocity.x;
-        }
-        else if (player._velocity.y < 0f)
+        if (player._velocity.y < 0f)
         {
             targetvelocity = Mathf.Lerp(player._velocity.x, desired, airControlFactor);
         }
@@ -102,6 +102,7 @@ public class FallState : PlayerState
             targetvelocity = desired;
         }
 
+        if (Mathf.Sign(player._velocity.x) != player.GetFacings()) player._velocity.x -= Time.deltaTime;
         player._velocity.x = Mathf.SmoothDamp(player._velocity.x, targetvelocity, ref player._smooothfactorx, _accelerationTimeAirborne);
     }
 

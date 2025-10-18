@@ -1245,7 +1245,7 @@ Transform:
   m_GameObject: {fileID: 338431740}
   serializedVersion: 2
   m_LocalRotation: {x: 0.0023795702, y: 0.0023795702, z: 0.7071028, w: 0.7071028}
-  m_LocalPosition: {x: -23.22, y: -10.39, z: 0.66}
+  m_LocalPosition: {x: -22.6, y: -12.19, z: 0.86}
   m_LocalScale: {x: 2.99, y: 5.98, z: 1.495}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1462,10 +1462,10 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _speed: 20
+  _speed: 15
   _localWaypoints:
   - {x: 0, y: 0, z: 0}
-  - {x: 18, y: 0, z: 0}
+  - {x: 16, y: 0, z: 0}
   trigger: 1
 --- !u!1 &360493790
 GameObject:
@@ -1621,7 +1621,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &378737188
 Transform:
   m_ObjectHideFlags: 0
@@ -1631,7 +1631,7 @@ Transform:
   m_GameObject: {fileID: 378737187}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 16.2541, y: -0.2188, z: 0}
+  m_LocalPosition: {x: 21.1, y: -3.4, z: 0}
   m_LocalScale: {x: 2.507781, y: 8.11785, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5362,7 +5362,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 338a7e57746ca6a4dbafa1ae7cd5b263, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _force: 37
+  _force: 30
   _squashDistance: 2
   _squashDuration: 0.2
 --- !u!61 &1234463911
@@ -9240,7 +9240,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1480422456467982231, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: _gravity
-      value: -88.888885
+      value: -69.20415
       objectReference: {fileID: 0}
     - target: {fileID: 1480422456467982231, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: _liftXCap
@@ -9248,7 +9248,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1480422456467982231, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: _liftYCap
-      value: 100
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 1480422456467982231, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: _dashSpeed
@@ -9268,11 +9268,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1480422456467982231, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: _dashDuration
-      value: 0.11
+      value: 0.09
       objectReference: {fileID: 0}
     - target: {fileID: 1480422456467982231, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: _jumpDuration
-      value: 0.3
+      value: 0.34
       objectReference: {fileID: 0}
     - target: {fileID: 1480422456467982231, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: _minJumpHeight
@@ -9288,7 +9288,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1480422456467982231, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: _terminalVelocity
-      value: 30
+      value: 33
       objectReference: {fileID: 0}
     - target: {fileID: 1480422456467982231, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: wallClimbDuration
@@ -9296,11 +9296,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1480422456467982231, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: wallHopOffForce.x
-      value: 20
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1480422456467982231, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: wallHopOffForce.y
-      value: 30
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 1480422456467982231, guid: 8442f5a7d08b9fb4fadc6bdef581ad13, type: 3}
       propertyPath: wallClimbDownSpeed

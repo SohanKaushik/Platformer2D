@@ -30,10 +30,10 @@ public class Controller2D : RaycastController
         _colldata.reset();
 
 
-        if (velocity.x != 0)
-        {
-            _colldata.facing = (int)Mathf.Sign(velocity.x);
-        }
+        //if (velocity.x != 0)
+        //{
+        //    _colldata.facing = (int)Mathf.Sign(velocity.x);
+        //}
 
         // Update player state
         transform.rotation = Quaternion.Euler(0f, _colldata.facing == -1 ? 180f : 0f, 0f);

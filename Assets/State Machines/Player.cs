@@ -30,6 +30,7 @@ public class Player : MonoBehaviour
     public JumpState _jump_state;
     public FallState _fall_state;
     public DashState _dash_state;
+    public BoostState _boost_state;
     public WallClimbState _wall_climb_state;
 
     [HideInInspector] public Vector3 _velocity;
@@ -75,8 +76,9 @@ public class Player : MonoBehaviour
         _idle_state = new IdleState(this, _stateMachine);
         _dash_state = new DashState(this, _stateMachine, _dashSpeed, _dashDuration);
         _run_state = new RunState(this, _stateMachine, _footSpeed, _accelerationTimeGrounded);
-        _wall_climb_state = new WallClimbState(this, _stateMachine, PlayerStateList.Wall_Climbing, wallClimbUpSpeed, wallClimbDownSpeed, wallHopOffForce);
         _fall_state = new FallState(this, _stateMachine, _terminalVelocity, _accelerationTimeAirborne);
+        _boost_state = new BoostState(this, _stateMachine, PlayerStateList.Boost);
+        _wall_climb_state = new WallClimbState(this, _stateMachine, PlayerStateList.Wall_Climbing, wallClimbUpSpeed, wallClimbDownSpeed, wallHopOffForce);
     }
 
     private void Start()
@@ -111,10 +113,8 @@ public class Player : MonoBehaviour
         wallClimbTimer = IsWallClimbing() ? wallClimbTimer - Time.deltaTime : wallClimbDuration;
         #endregion
 
-        int facing = (Mathf.Abs(GetAxisDirections().x) > 0.1f &&
-                     (_stateMachine._currentState._name != PlayerStateList.Dashing) &&
-                     Mathf.Abs(_velocity.x) > 0.1f) ?
-                     (int)Mathf.Sign(GetAxisDirections().x) : 0;
+        int facing = (Mathf.Abs(GetAxisDirections().x) > 0.1f && Mathf.Abs(_velocity.x) > 0.1f) ?
+                     (int)Mathf.Sign(GetAxisDirections().x) : _last_facing;
         _controller.SetFacings(facing);
       
         _stateMachine._currentState.Update();
@@ -129,10 +129,12 @@ public class Player : MonoBehaviour
         if (!isGrounded())
         {
             if (IsTouchingCeiling()) _velocity.y = 0.01f;
-            if (_stateMachine._currentState != _fall_state && !IsWallClimbAllowed() && !_isDashing)
+            if (_stateMachine._currentState != _fall_state && !IsWallClimbAllowed() && !_isDashing && _stateMachine._currentState != _boost_state)
                 _stateMachine.ChangeStateTo(_fall_state);
         }
-    
+        else this._liftBoosted = false;
+
+        if (IsRidingOnPlatform()) currentPlatform.trigger = true;
         _stateMachine._currentState.LateUpdate();
     }
 
@@ -203,9 +205,10 @@ public class Player : MonoBehaviour
             if (!currentPlatform) {
                 return Vector3.zero; }
 
-            Vector3 platformVelocity = currentPlatform.GetVelocity();
+            Vector3 platformVelocity = currentPlatform.GetVelocity() / Time.deltaTime;
             Vector3 liftBoost = platformVelocity;
 
+            if (Mathf.Sign(currentPlatform.GetVelocity().x) != GetFacings()) return Vector2.zero;
             if (Mathf.Abs(liftBoost.x) > _liftXCap)
                 liftBoost.x = _liftXCap * Mathf.Sign(liftBoost.x);
 
@@ -213,7 +216,6 @@ public class Player : MonoBehaviour
                 liftBoost.y = _liftYCap;
 
             _liftBoosted = true;
-            Debug.Log(liftBoost);
             return liftBoost;
         }
     }

@@ -30,7 +30,7 @@ public class WallClimbState : PlayerState
 
         player._velocity = Vector3.zero;
         player._liftBoosted = false;
-        _nudgePushAtEdge = new Vector2(_origin_direction * 10f, 20);
+        _nudgePushAtEdge = new Vector2(player.GetFacings() * 10f, 20);
     }
 
     public override void Update()
@@ -61,29 +61,37 @@ public class WallClimbState : PlayerState
         }
     }
 
+    private float _wallJumpCooldown = 0.1f;
+    private float _wallJumpTimer = 0f;
+
     public override void PhysicsUpdate()
     {
-        direciton = new Vector2((player.GetAxisDirections().x), (player.GetAxisDirections().y));
-        
-        var downwardForce = _climbDownSpeed * direciton.y;
-        var upwardForce = _climbUpSpeed * direciton.y;
+        Vector2 direction = player.GetAxisDirections();
 
-        if (_wallJumped) {
+        if (_wallJumped)
+        {
             _wallJumped = false;
+            _wallJumpTimer = _wallJumpCooldown;
 
-            player._velocity = (Mathf.Abs(direciton.x) > 0.1) ?
-                new Vector2(-_origin_direction * _wallJumpForce.x, _wallJumpForce.y) :
-                new Vector2(0, 70);
+            player._velocity = (Mathf.Abs(direction.x) > 0.1f)
+                ? new Vector2(-player.GetFacings() * _wallJumpForce.x, _wallJumpForce.y)
+                : new Vector2(0, _wallJumpForce.y * 1.67f);
+
             return;
         }
 
-        if (HasReachedClimbTopEdge()) {
-            player._velocity = _nudgePushAtEdge;
-            return;
+        if (_wallJumpTimer > 0f)
+        {
+            _wallJumpTimer -= Time.deltaTime;
+            return; // skip climb movement until cooldown ends
         }
-        player._velocity.y = (direciton.y > 0.1) ? 
-               upwardForce:
-               downwardForce;
+
+        if (direction.y > 0.1f)
+            player._velocity.y = _climbUpSpeed * direction.y;
+        else if (direction.y < -0.1f)
+            player._velocity.y = _climbDownSpeed * direction.y;
+        else
+            player._velocity.y = 0f;
     }
 
     private bool HasReachedClimbTopEdge()
@@ -114,5 +122,4 @@ public class WallClimbState : PlayerState
 
         return (!topHit && bottomHit);
     }
-
 }

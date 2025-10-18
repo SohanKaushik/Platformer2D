@@ -13,7 +13,6 @@ public class IdleState : PlayerState {
         player._smooothfactorx = 0.0f;
         
         player._isDashing = false;
-        player._liftBoosted = false;
         player._wallClimbTimeout = false;
     }
 
